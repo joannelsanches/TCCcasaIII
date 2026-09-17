@@ -1,0 +1,77 @@
+<%- include('../partials/cabecalho', { titulo: 'Convênios' }) %>
+<% const dataInput = (data) => data ? new Date(data).toISOString().slice(0, 10) : ''; %>
+
+<section class="section">
+  <div class="container container-wide">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Relações institucionais</span>
+      <h1>Convênios</h1>
+      <p class="muted">Cadastre o processo, armazene o PDF realmente assinado e registre os signatários antes da ativação.</p>
+    </div>
+
+    <details class="card form-card" open>
+      <summary><strong>Novo convênio</strong></summary>
+      <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+      <form method="post" enctype="multipart/form-data" class="form-grid spaced">
+        <div class="field <%= erros?.empresa ? 'field-invalid' : '' %>"><label for="empresa">Empresa *</label><select id="empresa" name="empresa" required aria-invalid="<%= erros?.empresa ? 'true' : 'false' %>"><option value="">Selecione</option><% empresas.forEach(empresa => { %><option value="<%= empresa._id %>" <%= String(valores?.empresa || '') === String(empresa._id) ? 'selected' : '' %>><%= formatarNomeProprio(empresa.nomeFantasia) %></option><% }) %></select><% if (erros?.empresa) { %><small class="field-error"><%= erros.empresa %></small><% } %></div>
+        <div class="field <%= erros?.numero ? 'field-invalid' : '' %>"><label for="numero">Número</label><input id="numero" name="numero" value="<%= valores?.numero || '' %>" aria-invalid="<%= erros?.numero ? 'true' : 'false' %>"><small class="help">Pode ficar vazio somente no rascunho.</small><% if (erros?.numero) { %><small class="field-error"><%= erros.numero %></small><% } %></div>
+        <div class="field <%= erros?.dataInicial ? 'field-invalid' : '' %>"><label for="dataInicial">Data inicial</label><input id="dataInicial" type="date" name="dataInicial" value="<%= valores?.dataInicial || '' %>" aria-invalid="<%= erros?.dataInicial ? 'true' : 'false' %>"><% if (erros?.dataInicial) { %><small class="field-error"><%= erros.dataInicial %></small><% } %></div>
+        <div class="field <%= erros?.dataFinal ? 'field-invalid' : '' %>"><label for="dataFinal">Data final</label><input id="dataFinal" type="date" name="dataFinal" value="<%= valores?.dataFinal || '' %>" aria-invalid="<%= erros?.dataFinal ? 'true' : 'false' %>"><% if (erros?.dataFinal) { %><small class="field-error"><%= erros.dataFinal %></small><% } %></div>
+        <div class="field full <%= erros?.pdfAssinado ? 'field-invalid' : '' %>"><label for="pdfAssinado">PDF assinado</label><input id="pdfAssinado" type="file" name="pdfAssinado" accept="application/pdf,.pdf" aria-invalid="<%= erros?.pdfAssinado ? 'true' : 'false' %>"><small class="help">Somente PDF. O arquivo fica protegido e não é anexado aos e-mails.</small><% if (erros?.pdfAssinado) { %><small class="field-error"><%= erros.pdfAssinado %></small><% } %></div>
+
+        <div class="field full form-section-title"><h3>Signatário da empresa</h3></div>
+        <div class="field"><label>Nome</label><input name="signatarioEmpresaNome" value="<%= valores?.signatarioEmpresaNome || '' %>"></div><div class="field"><label>Função</label><input name="signatarioEmpresaFuncao" value="<%= valores?.signatarioEmpresaFuncao || '' %>"></div><div class="field"><label>Entidade</label><input name="signatarioEmpresaEntidade" value="<%= valores?.signatarioEmpresaEntidade || '' %>"></div><div class="field"><label>Data da assinatura</label><input name="signatarioEmpresaData" type="date" value="<%= valores?.signatarioEmpresaData || '' %>"></div>
+        <div class="field full form-section-title"><h3>Signatário da instituição</h3></div>
+        <div class="field"><label>Nome</label><input name="signatarioInstituicaoNome" value="<%= valores?.signatarioInstituicaoNome || '' %>"></div><div class="field"><label>Função</label><input name="signatarioInstituicaoFuncao" value="<%= valores?.signatarioInstituicaoFuncao || '' %>"></div><div class="field"><label>Entidade</label><input name="signatarioInstituicaoEntidade" value="<%= valores?.signatarioInstituicaoEntidade || process.env.INSTITUICAO_NOME || '' %>"></div><div class="field"><label>Data da assinatura</label><input name="signatarioInstituicaoData" type="date" value="<%= valores?.signatarioInstituicaoData || '' %>"></div>
+        <% if (erros?.assinaturas) { %><div class="field full"><small class="field-error"><%= erros.assinaturas %></small></div><% } %>
+
+        <div class="field full form-actions"><button class="btn btn-secondary" name="acao" value="rascunho" formnovalidate>Salvar rascunho</button><button class="btn btn-secondary" name="acao" value="aguardar_assinaturas">Aguardar assinaturas</button><button class="btn" name="acao" value="enviar">Enviar para análise</button></div>
+      </form>
+    </details>
+
+    <div class="stack spaced">
+      <% convenios.forEach(convenio => { const assinatura = (papel) => convenio.assinaturas?.find(item => item.papel === papel) || {}; %>
+        <article class="card agreement-card">
+          <div class="section-heading">
+            <div><h2><%= formatarNomeProprio(convenio.empresa?.nomeFantasia) %></h2><p class="muted">Convênio <%= convenio.numero || 'sem número (rascunho)' %> · <%= formatarData(convenio.dataInicial) %> a <%= formatarData(convenio.dataFinal) %></p></div>
+            <span class="badge <%= convenio.status.toLowerCase() %>"><%= convenio.status.replaceAll('_', ' ') %></span>
+          </div>
+
+          <% if (convenio.regularizacaoPendente) { %><div class="alert aviso"><strong>Regularização pendente:</strong> este registro antigo precisa do PDF e dos signatários antes de sustentar novas aprovações.</div><% } %>
+          <% if (convenio.justificativa) { %><div class="alert erro"><strong>Justificativa:</strong> <%= convenio.justificativa %></div><% } %>
+
+          <div class="details-grid">
+            <div><strong>PDF assinado</strong><% if (convenio.pdfAssinado?.caminho) { %><a href="/convenios/<%= convenio._id %>/pdf">Visualizar PDF</a><% } else { %>Não anexado<% } %></div>
+            <div><strong>Assinatura da empresa</strong><%= formatarNomeProprio(assinatura('EMPRESA').nome || 'Faltando') %><% if (assinatura('EMPRESA').dataAssinatura) { %> · <%= formatarData(assinatura('EMPRESA').dataAssinatura) %><% } %></div>
+            <div><strong>Assinatura da instituição</strong><%= formatarNomeProprio(assinatura('INSTITUICAO').nome || 'Faltando') %><% if (assinatura('INSTITUICAO').dataAssinatura) { %> · <%= formatarData(assinatura('INSTITUICAO').dataAssinatura) %><% } %></div>
+          </div>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS','REPROVADO'].includes(convenio.status) || convenio.regularizacaoPendente) { %>
+            <details class="subform-panel">
+              <summary><strong>Anexar ou substituir PDF e signatários</strong></summary>
+              <form method="post" action="/admin/convenios/<%= convenio._id %>/pdf" enctype="multipart/form-data" class="form-grid">
+                <div class="field full"><label>PDF assinado *</label><input type="file" name="pdfAssinado" accept="application/pdf,.pdf" required></div>
+                <div class="field"><label>Signatário da empresa</label><input name="signatarioEmpresaNome" value="<%= assinatura('EMPRESA').nome || '' %>" required></div><div class="field"><label>Função</label><input name="signatarioEmpresaFuncao" value="<%= assinatura('EMPRESA').funcao || '' %>"></div><div class="field"><label>Entidade</label><input name="signatarioEmpresaEntidade" value="<%= assinatura('EMPRESA').entidade || convenio.empresa?.razaoSocial || '' %>"></div><div class="field"><label>Data</label><input name="signatarioEmpresaData" type="date" value="<%= dataInput(assinatura('EMPRESA').dataAssinatura) %>" required></div>
+                <div class="field"><label>Signatário da instituição</label><input name="signatarioInstituicaoNome" value="<%= assinatura('INSTITUICAO').nome || '' %>" required></div><div class="field"><label>Função</label><input name="signatarioInstituicaoFuncao" value="<%= assinatura('INSTITUICAO').funcao || '' %>"></div><div class="field"><label>Entidade</label><input name="signatarioInstituicaoEntidade" value="<%= assinatura('INSTITUICAO').entidade || process.env.INSTITUICAO_NOME || '' %>"></div><div class="field"><label>Data</label><input name="signatarioInstituicaoData" type="date" value="<%= dataInput(assinatura('INSTITUICAO').dataAssinatura) %>" required></div>
+                <div class="field full"><button class="btn btn-secondary">Salvar PDF e signatários</button></div>
+              </form>
+            </details>
+          <% } %>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS','REPROVADO'].includes(convenio.status)) { %><form method="post" action="/admin/convenios/<%= convenio._id %>/enviar-analise" class="separate-action" data-confirmar="Enviar este convênio para análise?"><button class="btn">Enviar para análise</button></form><% } %>
+          <% if (convenio.status === 'PENDENTE') { %>
+            <div class="agreement-review-actions">
+              <form method="post" action="/admin/convenios/<%= convenio._id %>/status"><input type="hidden" name="status" value="ATIVO"><button class="btn">Ativar convênio</button></form>
+              <form method="post" action="/admin/convenios/<%= convenio._id %>/status" class="rejection-form"><input type="hidden" name="status" value="REPROVADO"><label class="sr-only" for="justificativa-convenio-<%= convenio._id %>">Justificativa</label><input id="justificativa-convenio-<%= convenio._id %>" name="justificativa" placeholder="Justificativa da reprovação" required><button class="btn btn-danger">Reprovar</button></form>
+            </div>
+          <% } %>
+          <% if (convenio.status === 'ATIVO') { %><form method="post" action="/admin/convenios/<%= convenio._id %>/status" class="separate-action" data-confirmar="Inativar este convênio?"><input type="hidden" name="status" value="INATIVO"><button class="btn btn-danger">Inativar</button></form><% } %>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!convenios.length) { %><div class="empty">Nenhum convênio cadastrado.</div><% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

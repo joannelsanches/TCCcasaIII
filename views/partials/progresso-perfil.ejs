@@ -1,0 +1,10 @@
+<section class="profile-progress" aria-labelledby="progresso-perfil-titulo">
+  <div class="profile-progress-heading">
+    <strong id="progresso-perfil-titulo">Perfil <%= conclusaoPerfil.percentual %>% completo</strong>
+    <% if (conclusaoPerfil.faltantes.length) { %><span>Falta: <%= conclusaoPerfil.faltantes.slice(0, 3).join(', ') %><%= conclusaoPerfil.faltantes.length > 3 ? '…' : '' %></span><% } else { %><span>Todos os dados foram preenchidos.</span><% } %>
+  </div>
+  <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= conclusaoPerfil.percentual %>" aria-label="Conclusão do perfil">
+    <span style="width:<%= conclusaoPerfil.percentual %>%"></span>
+  </div>
+</section>
+

@@ -1,0 +1,10 @@
+<%- include('../partials/cabecalho', { titulo: 'Avaliação final' }) %>
+
+<section class="section"><div class="container">
+  <div class="page-header"><h1>Avaliação final</h1><p class="muted">Conte como foi a experiência após a aprovação do termo.</p></div>
+  <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+  <% if (candidaturas.length) { %><div class="card form-card"><form method="post" action="/avaliacoes" class="form-grid"><div class="field full <%= erros?.candidatura ? 'field-invalid' : '' %>"><label>Estágio *</label><select name="candidatura" required aria-invalid="<%= erros?.candidatura ? 'true' : 'false' %>"><% candidaturas.forEach(c => { %><option value="<%= c._id %>" <%= String(valores?.candidatura || '') === String(c._id) ? 'selected' : '' %>><%= c.vaga.titulo %> — <%= formatarNomeProprio(c.vaga.empresa?.nomeFantasia) %></option><% }) %></select><% if (erros?.candidatura) { %><small class="field-error"><%= erros.candidatura %></small><% } %></div><%- include('../partials/estrelas-form', { identificador: 'estudante' }) %><div class="field full <%= erros?.comentario ? 'field-invalid' : '' %>"><label>Comentário *</label><textarea name="comentario" required aria-invalid="<%= erros?.comentario ? 'true' : 'false' %>"><%= valores?.comentario || '' %></textarea><% if (erros?.comentario) { %><small class="field-error"><%= erros.comentario %></small><% } %></div><div class="field full"><button class="btn">Enviar avaliação</button></div></form></div><% } else { %><div class="empty">Não há estágio aprovado pendente da sua avaliação.</div><% } %>
+  <div class="grid spaced"><% avaliacoes.forEach(a => { %><article class="card"><%- include('../partials/estrelas-display', { nota: a.nota }) %><h3><%= a.vaga?.titulo %></h3><p><%= a.comentario %></p><small class="muted"><%= formatarNomeProprio(a.empresa?.nomeFantasia) %> · <%= formatarData(a.data) %></small></article><% }) %></div>
+</div></section>
+
+<%- include('../partials/rodape') %>

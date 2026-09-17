@@ -1,0 +1,81 @@
+<%- include('../partials/cabecalho', { titulo: 'Notificações institucionais' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Enviar notificação institucional</h1>
+            <p class="muted">
+                Envie para todos, por perfil ou por curso.
+            </p>
+        </div>
+
+        <div class="card form-card">
+            <form method="post" class="form-grid">
+
+                <div class="field">
+                    <label>Público</label>
+
+                    <select name="publico" required>
+                        <option value="TODOS">
+                            Todos os usuários
+                        </option>
+
+                        <option value="ESTUDANTE">
+                            Todos os estudantes
+                        </option>
+
+                        <option value="EMPRESA">
+                            Todas as empresas
+                        </option>
+
+                        <option value="ADMIN">
+                            Administradores
+                        </option>
+
+                        <option value="CURSO">
+                            Estudantes de um curso
+                        </option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Curso (quando aplicável)</label>
+
+                    <select name="curso">
+                        <option value="">Selecione</option>
+
+                        <% cursos.forEach(c => { %>
+                            <option value="<%= c._id %>">
+                                <%= c.nome %>
+                            </option>
+                        <% }) %>
+                    </select>
+                </div>
+
+                <div class="field full">
+                    <label>Título</label>
+                    <input name="titulo" required>
+                </div>
+
+                <div class="field full">
+                    <label>Mensagem</label>
+                    <textarea name="mensagem" required></textarea>
+                </div>
+
+                <div class="field full">
+                    <label>Link relacionado</label>
+                    <input name="link" placeholder="/vagas">
+                </div>
+
+                <button class="btn">
+                    Enviar notificações
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

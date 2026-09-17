@@ -1,0 +1,138 @@
+<%- include('../partials/cabecalho', { titulo: 'Início' }) %>
+
+<section class="hero">
+    <div class="container hero-grid">
+
+        <div>
+            <span class="eyebrow">
+                IFSul Campus Bagé
+            </span>
+
+            <h1>
+                Seu estágio começa no
+                <span>StartIF</span>.
+            </h1>
+
+            <p>
+                Encontre vagas compatíveis com seu curso, envie seu currículo
+                e acompanhe cada etapa do processo seletivo.
+            </p>
+
+            <div class="actions">
+                <a class="btn btn-secondary" href="/vagas">
+                    Explorar vagas
+                </a>
+
+                <% if (!usuarioLogado) { %>
+                    <a class="btn" href="/login">
+                        Entrar
+                    </a>
+
+                    <a class="btn btn-secondary" href="/cadastro">
+                        Criar conta
+                    </a>
+                <% } else { %>
+                    <% const destinoPainel = usuarioLogado.tipo === 'ADMIN' ? '/admin' : usuarioLogado.tipo === 'EMPRESA' ? '/empresa' : '/estudante'; %>
+                    <a class="btn" href="<%= destinoPainel %>">
+                        Acessar meu painel
+                    </a>
+                <% } %>
+            </div>
+        </div>
+
+        <div class="hero-art">
+
+            <div class="art-card">
+                <div class="art-dots">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+
+                </div>
+
+                <h3>Vagas validadas</h3>
+
+                <p class="muted">
+                    Oportunidades conferidas pelo setor de estágios.
+                </p>
+            </div>
+
+            <div class="art-card2">
+                <div class="art-dots">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+
+                </div>
+                <h3>Do cadastro ao termo</h3>
+
+                <p>
+                    Acompanhe tudo em uma plataforma simples.
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+
+<section class="section">
+    <div class="container container-wide">
+
+        <div class="metrics">
+
+            <div class="metric">
+                <strong><%= vagas.length %>+</strong>
+                <span>vagas recentes</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= estudantes %></strong>
+                <span>estudantes</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= empresas %></strong>
+                <span>empresas</span>
+            </div>
+
+        </div>
+
+
+        <div class="section-heading" style="margin-top:40px">
+
+            <div>
+                <h2>Oportunidades recentes</h2>
+
+                <p class="muted">
+                    Vagas abertas e dentro do prazo.
+                </p>
+            </div>
+
+            <a href="/vagas">
+                Ver todas →
+            </a>
+
+        </div>
+
+
+        <div class="jobs-grid">
+            <% vagas.forEach(vaga => { %>
+                <%- include('../partials/vaga-card', { vaga }) %>
+            <% }) %>
+        </div>
+
+
+        <% if (!vagas.length) { %>
+
+            <div class="empty">
+                Nenhuma vaga aberta no momento.
+            </div>
+
+        <% } %>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

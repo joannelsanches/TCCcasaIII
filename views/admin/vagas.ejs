@@ -1,0 +1,105 @@
+<%- include('../partials/cabecalho', { titulo: 'Validação de vagas' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Validação de vagas</h1>
+            <p class="muted">
+                Verifique a compatibilidade com os cursos e o PPC antes da publicação.
+            </p>
+        </div>
+
+        <div class="stack">
+
+            <% vagas.forEach(v => { %>
+                <article class="card">
+
+                    <div class="section-heading">
+                        <div>
+                            <span class="tag">
+                                <%= v.areaAtuacao?.nome %>
+                            </span>
+
+                            <h2>
+                                <%= v.titulo %>
+                            </h2>
+
+                            <p>
+                                <strong><%= formatarNomeProprio(v.empresa?.nomeFantasia) %></strong>
+                                ·
+                                <%= v.modalidade === 'REMOTO' ? 'Remoto' : formatarEndereco(v.localizacao, v.localizacaoAntiga) %>
+                            </p>
+                        </div>
+
+                        <span class="badge <%= v.status.toLowerCase() %>">
+                            <%= v.status.replaceAll('_',' ') %>
+                        </span>
+                    </div>
+
+                    <p>
+                        <strong>Descrição:</strong>
+                        <%= v.descricao %>
+                    </p>
+
+                    <p>
+                        <strong>Requisitos:</strong>
+                        <%= v.requisitos %>
+                    </p>
+                    <p>
+                        <strong>Atividades:</strong>
+                        <%= v.atividades || 'Não especificadas' %>
+                    </p>
+
+                    <p>
+                        <strong>Cursos:</strong>
+                        <%= v.cursosCompativeis.map(c => c.nome).join(', ') %>
+                    </p>
+
+                    <p>
+                        <strong>Bolsa/carga:</strong>
+                        <%= formatarMoeda(v.bolsa) %>
+                        ·
+                        <%= v.cargaHorariaDiaria || '—' %>h/dia · <%= v.cargaHorariaSemanal || v.cargaHoraria %>h/semana
+                    </p>
+
+                    <p><strong>Período/modalidade:</strong> <%= formatarData(v.periodoInicio) %> a <%= formatarData(v.periodoFim) %> · <%= v.modalidadeEstagio?.replaceAll('_',' ') %> · <%= v.modalidade %></p>
+                    <p><strong>Supervisor:</strong> <%= formatarNomeProprio(v.supervisor?.nome || '—') %> · <%= v.supervisor?.formacao || v.supervisor?.experiencia || 'formação/experiência não informada' %></p>
+
+                    <form
+                        method="post"
+                        action="/admin/vagas/<%= v._id %>/validar"
+                        class="form-grid"
+                    >
+
+                        <div class="field full">
+                            <label>Justificativa ou observação</label>
+
+                            <textarea name="justificativa"><%= v.justificativaValidacao || '' %></textarea>
+                        </div>
+
+                        <button class="btn" name="decisao" value="aprovar">
+                            Aprovar vaga
+                        </button>
+
+                        <button class="btn btn-danger" name="decisao" value="reprovar">
+                            Reprovar vaga
+                        </button>
+
+                    </form>
+
+                </article>
+            <% }) %>
+
+        </div>
+
+        <% if (!vagas.length) { %>
+            <div class="empty">
+                Não há vagas aguardando validação.
+            </div>
+        <% } %>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

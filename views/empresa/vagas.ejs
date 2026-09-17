@@ -1,0 +1,19 @@
+<%- include('../partials/cabecalho', { titulo: 'Minhas vagas' }) %>
+
+<section class="section"><div class="container">
+  <div class="section-heading"><div class="page-header"><h1>Minhas vagas</h1><p class="muted">As ações disponíveis mudam conforme a situação da vaga.</p></div><a class="btn" href="/empresa/vagas/nova">+ Nova vaga</a></div>
+  <div class="table-wrap"><table><thead><tr><th>Vaga</th><th>Prazo</th><th>Status</th><th>Ações</th></tr></thead><tbody>
+  <% vagas.forEach(v => { %><tr><td><div class="table-media"><% if (v.imagem?.caminho) { %><img src="/midia/vagas/<%= v._id %>/imagem" alt=""><% } else { %><span class="media-placeholder">SI</span><% } %><div><strong><%= v.titulo %></strong><small><%= v.areaAtuacao?.nome %> · <%= v.modalidade || 'PRESENCIAL' %></small><% if (v.justificativaValidacao) { %><small class="error-text"><%= v.justificativaValidacao %></small><% } %></div></div></td><td><%= formatarData(v.prazo) %></td><td><span class="badge <%= v.status.toLowerCase() %>"><%= v.status.replaceAll('_',' ') %></span></td><td><div class="actions table-actions">
+    <a class="btn btn-small btn-secondary" href="/empresa/candidatos/<%= v._id %>">Candidatos</a>
+    <% if (v.status !== 'CANCELADA') { %><a class="btn btn-small btn-secondary" href="/empresa/vagas/<%= v._id %>/editar"><%= v.status === 'REPROVADA' ? 'Editar e reenviar' : v.status === 'RASCUNHO' ? 'Continuar rascunho' : 'Editar' %></a><% } %>
+    <form method="post" action="/empresa/vagas/<%= v._id %>/duplicar"><button class="btn btn-small btn-secondary">Duplicar</button></form>
+    <% if (v.status === 'ABERTA') { %><form method="post" action="/empresa/vagas/<%= v._id %>/situacao" data-confirmar="Confirma o fechamento da vaga?"><input type="hidden" name="acao" value="fechar"><button class="btn btn-small">Fechar</button></form><% } %>
+    <% if (v.status === 'FECHADA') { %><form method="post" action="/empresa/vagas/<%= v._id %>/reabrir" data-confirmar="Enviar a reabertura para nova validação?"><button class="btn btn-small">Reabrir</button></form><% } %>
+    <% if (['ABERTA','FECHADA','PENDENTE_VALIDACAO','REPROVADA'].includes(v.status)) { %><form method="post" action="/empresa/vagas/<%= v._id %>/situacao" data-confirmar="Cancelar esta vaga? Esta ação não permite reabertura direta."><input type="hidden" name="acao" value="cancelar"><button class="btn btn-small btn-danger">Cancelar</button></form><% } %>
+    <% if (v.status === 'RASCUNHO') { %><form method="post" action="/empresa/vagas/<%= v._id %>/rascunho/excluir" data-confirmar="Excluir definitivamente este rascunho?"><button class="btn btn-small btn-danger">Excluir rascunho</button></form><% } %>
+  </div></td></tr><% }) %>
+  </tbody></table></div>
+  <% if (!vagas.length) { %><div class="empty">Nenhuma vaga cadastrada.</div><% } %>
+</div></section>
+
+<%- include('../partials/rodape') %>

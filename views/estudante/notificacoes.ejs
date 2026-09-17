@@ -1,0 +1,50 @@
+<%- include('../partials/cabecalho', { titulo: 'Notificações' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="section-heading page-heading-actions">
+      <div class="page-header page-header-left">
+        <span class="eyebrow">Central de avisos</span>
+        <h1>Notificações</h1>
+        <p class="muted">Atualizações sobre vagas, candidaturas, documentos e termos.</p>
+      </div>
+      <% if (contagens.nao_lidas > 0) { %>
+        <form method="post" action="/notificacoes/marcar-todas-lidas">
+          <button class="btn btn-secondary">Marcar todas como lidas</button>
+        </form>
+      <% } %>
+    </div>
+
+    <nav class="filter-tabs" aria-label="Filtrar notificações">
+      <a class="<%= status === 'todas' ? 'active' : '' %>" href="/notificacoes?status=todas">Todas <span><%= contagens.todas %></span></a>
+      <a class="<%= status === 'nao_lidas' ? 'active' : '' %>" href="/notificacoes?status=nao_lidas">Não lidas <span><%= contagens.nao_lidas %></span></a>
+      <a class="<%= status === 'lidas' ? 'active' : '' %>" href="/notificacoes?status=lidas">Lidas <span><%= contagens.lidas %></span></a>
+    </nav>
+
+    <div class="stack notification-list">
+      <% notificacoes.forEach(notificacao => { %>
+        <article class="card notification <%= notificacao.lida ? '' : 'nao-lida' %>">
+          <div class="notification-content">
+            <div class="section-heading">
+              <h2><%= notificacao.titulo %></h2>
+              <span class="badge <%= notificacao.lida ? '' : 'aberta' %>"><%= notificacao.lida ? 'LIDA' : 'NOVA' %></span>
+            </div>
+            <p><%= notificacao.mensagem %></p>
+            <time class="muted" datetime="<%= new Date(notificacao.data).toISOString() %>"><%= formatarData(notificacao.data) %></time>
+          </div>
+          <form method="post" action="/notificacoes/<%= notificacao._id %>/ler">
+            <button class="btn btn-small btn-secondary"><%= notificacao.lida ? 'Abrir' : 'Marcar como lida e abrir' %></button>
+          </form>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!notificacoes.length) { %>
+      <div class="empty">
+        <%= status === 'nao_lidas' ? 'Você não possui notificações não lidas.' : status === 'lidas' ? 'Você ainda não possui notificações lidas.' : 'Você não tem notificações.' %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

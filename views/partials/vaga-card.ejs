@@ -1,0 +1,33 @@
+<article class="card job-card">
+  <div class="job-image">
+    <% if (vaga.imagem?.caminho) { %>
+      <img src="/midia/vagas/<%= vaga._id %>/imagem" alt="Imagem da vaga <%= vaga.titulo %>">
+    <% } else { %>
+      <div class="job-image-placeholder" aria-hidden="true"><span>StartIF</span></div>
+    <% } %>
+  </div>
+  <div class="job-content">
+    <div class="company-line">
+      <% if (vaga.empresa?.logo?.caminho) { %>
+        <img src="/midia/empresas/<%= vaga.empresa._id %>/logo" alt="">
+      <% } else { %>
+        <span class="mini-initials" aria-hidden="true"><%= iniciais(vaga.empresa?.nomeFantasia) %></span>
+      <% } %>
+      <span class="line-clamp-1"><%= formatarNomeProprio(vaga.empresa?.nomeFantasia || 'Empresa') %></span>
+    </div>
+    <span class="tag"><%= vaga.areaAtuacao?.nome || 'Estágio' %></span>
+    <h3 class="line-clamp-2"><%= vaga.titulo %></h3>
+    <div class="job-meta">
+      <span class="tag"><%= (vaga.modalidade || 'PRESENCIAL').replaceAll('_', ' ') %></span>
+      <span class="tag"><%= vaga.cargaHorariaSemanal || vaga.cargaHoraria || '—' %>h/semana</span>
+      <span class="tag"><%= formatarMoeda(vaga.bolsa) %></span>
+    </div>
+    <p class="job-location line-clamp-2">
+      <strong>Local:</strong>
+      <%= vaga.modalidade === 'REMOTO' ? 'Remoto' : formatarLocalizacaoResumida(vaga.localizacao, vaga.localizacaoAntiga) %>
+    </p>
+    <p class="job-deadline"><strong>Prazo:</strong> <%= formatarData(vaga.prazo) %></p>
+    <div class="actions"><a class="btn btn-secondary full-width" href="/vagas/<%= vaga._id %>">Ver detalhes</a></div>
+  </div>
+</article>
+

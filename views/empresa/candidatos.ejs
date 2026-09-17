@@ -1,0 +1,76 @@
+<%- include('../partials/cabecalho', { titulo: 'Candidatos' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>
+                Candidatos — <%= vaga.titulo %>
+            </h1>
+
+            <p class="muted">
+                Somente candidatos desta vaga podem ser visualizados.
+            </p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Estudante</th>
+                        <th>Curso</th>
+                        <th>Data</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% candidaturas.forEach(c => { %>
+                        <tr>
+
+                            <td>
+                                <%= formatarNomeProprio(c.estudante.usuario.nome) %>
+                            </td>
+
+                            <td>
+                                <%= c.estudante.curso?.nome %>
+                            </td>
+
+                            <td>
+                                <%= formatarData(c.dataCandidatura) %>
+                            </td>
+
+                            <td>
+                                <span class="badge <%= c.status.toLowerCase() %>">
+                                    <%= c.status.replaceAll('_',' ') %>
+                                </span>
+                            </td>
+
+                            <td>
+                                <a
+                                    class="btn btn-small btn-secondary"
+                                    href="/empresa/candidato/<%= c._id %>"
+                                >
+                                    Ver perfil
+                                </a>
+                            </td>
+
+                        </tr>
+                    <% }) %>
+                </tbody>
+
+            </table>
+        </div>
+
+        <% if (!candidaturas.length) { %>
+            <div class="empty">
+                Esta vaga ainda não recebeu candidaturas.
+            </div>
+        <% } %>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

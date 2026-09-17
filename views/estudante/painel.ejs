@@ -1,0 +1,27 @@
+<%- include('../partials/cabecalho', { titulo: 'Painel do estudante' }) %>
+
+<section class="section">
+  <div class="container container-wide">
+    <div class="dashboard-header">
+      <div class="dashboard-identity">
+        <% if (estudante.fotoPerfil?.caminho) { %><img class="profile-photo small" src="/midia/estudantes/<%= estudante._id %>/foto" alt="Foto de <%= formatarNomeProprio(usuarioLogado.nome) %>"><% } else { %><span class="profile-photo initials small"><%= iniciais(usuarioLogado.nome) %></span><% } %>
+        <div><span class="eyebrow">Área do estudante</span><h1>Olá, <%= formatarNomeProprio(usuarioLogado.nome) %>!</h1><p class="muted"><%= estudante.curso?.nome %> · <%= estudante.campus?.nome %></p></div>
+      </div>
+      <a class="btn btn-secondary" href="/estudante/perfil">Completar perfil</a>
+    </div>
+
+    <%- include('../partials/progresso-perfil', { conclusaoPerfil }) %>
+
+    <div class="metrics metrics-compact">
+      <div class="metric"><strong><%= candidaturas %></strong><span>candidaturas</span></div>
+      <div class="metric"><strong><%= termos %></strong><span>termos pendentes</span></div>
+      <div class="metric"><strong><%= estudante.curriculo?.caminho ? 'OK' : '—' %></strong><span>currículo</span></div>
+    </div>
+
+    <div class="section-heading spaced"><div><h2>Vagas para o seu curso</h2><p class="muted">Oportunidades abertas e compatíveis.</p></div><a href="/vagas">Buscar mais →</a></div>
+    <div class="jobs-grid"><% vagas.forEach(vaga => { %><%- include('../partials/vaga-card', { vaga }) %><% }) %></div>
+    <% if (!vagas.length) { %><div class="empty">Ainda não há vagas compatíveis com o seu curso.</div><% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

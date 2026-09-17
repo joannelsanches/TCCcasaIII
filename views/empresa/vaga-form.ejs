@@ -1,0 +1,83 @@
+<%- include('../partials/cabecalho', { titulo: vaga ? 'Editar vaga' : 'Nova vaga' }) %>
+<% const dataCampo = (data) => data ? new Date(data).toISOString().slice(0,10) : ''; %>
+<%
+  const valorInformado = typeof valores !== 'undefined' && valores ? valores : {};
+  const campo = (nome, atual = '') => Object.prototype.hasOwnProperty.call(valorInformado, nome) ? valorInformado[nome] : (atual ?? '');
+  const marcado = (nome, valor, atuais = []) => {
+    const informados = Object.prototype.hasOwnProperty.call(valorInformado, nome) ? (Array.isArray(valorInformado[nome]) ? valorInformado[nome] : [valorInformado[nome]]) : atuais;
+    return informados.map(String).includes(String(valor));
+  };
+  const formularioReenviado = Object.keys(valorInformado).length > 0;
+  const modalidadeAtual = campo('modalidade', vaga?.modalidade || 'PRESENCIAL');
+%>
+
+<section class="section">
+  <div class="container">
+    <div class="page-header"><h1><%= vaga ? 'Editar vaga' : 'Publicar nova vaga' %></h1><p class="muted">A criação, edição ou reenvio passa por validação institucional antes da publicação.</p></div>
+    <div class="card form-card">
+      <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+      <form method="post" enctype="multipart/form-data" class="form-grid" data-vaga-form>
+        <div class="field full form-section-title"><h2>Apresentação</h2></div>
+        <div class="field full <%= erros?.titulo ? 'field-invalid' : '' %>"><label for="titulo">Título *</label><input id="titulo" name="titulo" value="<%= campo('titulo', vaga?.titulo) %>" required aria-invalid="<%= erros?.titulo ? 'true' : 'false' %>"><% if (erros?.titulo) { %><small class="field-error"><%= erros.titulo %></small><% } %></div>
+        <div class="field full <%= erros?.descricao ? 'field-invalid' : '' %>"><label for="descricao">Descrição pública *</label><textarea id="descricao" name="descricao" required aria-invalid="<%= erros?.descricao ? 'true' : 'false' %>"><%= campo('descricao', vaga?.descricao) %></textarea><% if (erros?.descricao) { %><small class="field-error"><%= erros.descricao %></small><% } %></div>
+        <div class="field <%= erros?.areaAtuacao ? 'field-invalid' : '' %>"><label for="areaAtuacao">Área de atuação *</label><select id="areaAtuacao" name="areaAtuacao" required aria-invalid="<%= erros?.areaAtuacao ? 'true' : 'false' %>"><option value="">Selecione</option><% areas.forEach(a => { %><option value="<%= a._id %>" <%= String(campo('areaAtuacao', vaga?.areaAtuacao)) === String(a._id) ? 'selected' : '' %>><%= a.nome %></option><% }) %></select><% if (erros?.areaAtuacao) { %><small class="field-error"><%= erros.areaAtuacao %></small><% } %></div>
+        <div class="field <%= erros?.campus ? 'field-invalid' : '' %>"><label for="campus">Campus relacionado *</label><select id="campus" name="campus" required aria-invalid="<%= erros?.campus ? 'true' : 'false' %>"><option value="">Selecione</option><% campi.forEach(c => { %><option value="<%= c._id %>" <%= String(campo('campus', vaga?.campus)) === String(c._id) ? 'selected' : '' %>><%= c.nome %></option><% }) %></select><% if (erros?.campus) { %><small class="field-error"><%= erros.campus %></small><% } %></div>
+        <div class="field full image-field">
+          <label>Imagem da vaga (opcional)</label>
+          <% if (vaga?.imagem?.caminho) { %><img class="vacancy-form-image" src="/midia/vagas/<%= vaga._id %>/imagem" alt="Imagem atual da vaga"><% } %>
+          <div class="image-preview image-preview-wide" data-preview-box hidden><img alt="Pré-visualização da nova imagem" data-preview-image></div>
+          <input type="file" name="imagem" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" data-image-input data-preview-target="[data-preview-image]">
+          <small class="help">Se nenhum arquivo for escolhido, a imagem atual será preservada.</small>
+        </div>
+
+        <div class="field full form-section-title"><h2>Estágio e atividades</h2></div>
+        <div class="field"><label>Modalidade do estágio *</label><select name="modalidadeEstagio" required><option value="NAO_OBRIGATORIO" <%= campo('modalidadeEstagio', vaga?.modalidadeEstagio || 'NAO_OBRIGATORIO') === 'NAO_OBRIGATORIO' ? 'selected' : '' %>>Não obrigatório</option><option value="OBRIGATORIO" <%= campo('modalidadeEstagio', vaga?.modalidadeEstagio) === 'OBRIGATORIO' ? 'selected' : '' %>>Obrigatório</option></select></div>
+        <div class="field"><label>Forma de trabalho *</label><select name="modalidade" required data-modalidade><% ['PRESENCIAL','HIBRIDO','REMOTO'].forEach(m => { %><option value="<%= m %>" <%= modalidadeAtual === m ? 'selected' : '' %>><%= m %></option><% }) %></select></div>
+        <div class="field full <%= erros?.atividades ? 'field-invalid' : '' %>"><label>Atividades que serão desenvolvidas *</label><textarea name="atividades" required aria-invalid="<%= erros?.atividades ? 'true' : 'false' %>"><%= campo('atividades', vaga?.atividades) %></textarea><% if (erros?.atividades) { %><small class="field-error"><%= erros.atividades %></small><% } %></div>
+        <div class="field full <%= erros?.requisitos ? 'field-invalid' : '' %>"><label>Requisitos para candidatura *</label><textarea name="requisitos" required aria-invalid="<%= erros?.requisitos ? 'true' : 'false' %>"><%= campo('requisitos', vaga?.requisitos) %></textarea><% if (erros?.requisitos) { %><small class="field-error"><%= erros.requisitos %></small><% } %></div>
+        <div class="field full"><label>Requisitos acadêmicos</label><textarea name="requisitosAcademicos"><%= campo('requisitosAcademicos', vaga?.requisitosAcademicos) %></textarea></div>
+        <div class="field full"><label>Documentos solicitados</label><input name="documentosObrigatorios" value="<%= campo('documentosObrigatorios', vaga?.documentosObrigatorios?.join(', ')) %>"><small class="help">Separe por vírgulas. Estes documentos não substituem os anexos do termo.</small></div>
+        <div class="field full <%= erros?.cursosCompativeis ? 'field-invalid' : '' %>"><label>Cursos compatíveis *</label><div class="check-grid"><% cursos.forEach(c => { %><label class="check-card"><input type="checkbox" name="cursosCompativeis" value="<%= c._id %>" <%= marcado('cursosCompativeis', c._id, vaga?.cursosCompativeis || []) ? 'checked' : '' %> data-group-required="cursos"><span><%= c.nome %><small><%= c.campus?.nome %></small></span></label><% }) %></div><% if (erros?.cursosCompativeis) { %><small class="field-error"><%= erros.cursosCompativeis %></small><% } %></div>
+
+        <div class="field full form-section-title"><h2>Jornada e período</h2></div>
+        <div class="field <%= erros?.cargaHorariaDiaria ? 'field-invalid' : '' %>"><label>Carga diária *</label><input name="cargaHorariaDiaria" type="number" min="1" max="8" value="<%= campo('cargaHorariaDiaria', vaga?.cargaHorariaDiaria) %>" required aria-invalid="<%= erros?.cargaHorariaDiaria ? 'true' : 'false' %>"><small class="help">Acima de 6h somente quando a regra do curso/PPC permitir jornada de 40h.</small><% if (erros?.cargaHorariaDiaria) { %><small class="field-error"><%= erros.cargaHorariaDiaria %></small><% } %></div>
+        <div class="field <%= erros?.cargaHorariaSemanal ? 'field-invalid' : '' %>"><label>Carga semanal *</label><input name="cargaHorariaSemanal" type="number" min="1" max="40" value="<%= campo('cargaHorariaSemanal', vaga?.cargaHorariaSemanal || vaga?.cargaHoraria) %>" required aria-invalid="<%= erros?.cargaHorariaSemanal ? 'true' : 'false' %>"><% if (erros?.cargaHorariaSemanal) { %><small class="field-error"><%= erros.cargaHorariaSemanal %></small><% } %></div>
+        <div class="field <%= erros?.horarioInicio ? 'field-invalid' : '' %>"><label>Horário inicial *</label><input name="horarioInicio" type="time" value="<%= campo('horarioInicio', vaga?.horarioInicio) %>" required aria-invalid="<%= erros?.horarioInicio ? 'true' : 'false' %>"><% if (erros?.horarioInicio) { %><small class="field-error"><%= erros.horarioInicio %></small><% } %></div>
+        <div class="field <%= erros?.horarioFim ? 'field-invalid' : '' %>"><label>Horário final *</label><input name="horarioFim" type="time" value="<%= campo('horarioFim', vaga?.horarioFim) %>" required aria-invalid="<%= erros?.horarioFim ? 'true' : 'false' %>"><% if (erros?.horarioFim) { %><small class="field-error"><%= erros.horarioFim %></small><% } %></div>
+        <div class="field"><label>Intervalo</label><input name="intervalo" placeholder="Ex.: 12h às 13h" value="<%= campo('intervalo', vaga?.intervalo) %>"></div>
+        <div class="field <%= erros?.quantidadeVagas ? 'field-invalid' : '' %>"><label>Quantidade de vagas *</label><input name="quantidadeVagas" type="number" min="1" value="<%= campo('quantidadeVagas', vaga?.quantidadeVagas || 1) %>" required aria-invalid="<%= erros?.quantidadeVagas ? 'true' : 'false' %>"><% if (erros?.quantidadeVagas) { %><small class="field-error"><%= erros.quantidadeVagas %></small><% } %></div>
+        <div class="field full <%= erros?.diasSemana ? 'field-invalid' : '' %>"><label>Dias da semana *</label><div class="check-grid compact"><% [['SEGUNDA','Segunda'],['TERCA','Terça'],['QUARTA','Quarta'],['QUINTA','Quinta'],['SEXTA','Sexta'],['SABADO','Sábado']].forEach(([valor,rotulo]) => { %><label class="check-card"><input type="checkbox" name="diasSemana" value="<%= valor %>" <%= marcado('diasSemana', valor, vaga?.diasSemana || []) ? 'checked' : '' %> data-group-required="dias"><span><%= rotulo %></span></label><% }) %></div><% if (erros?.diasSemana) { %><small class="field-error"><%= erros.diasSemana %></small><% } %></div>
+        <div class="field <%= erros?.periodoInicio ? 'field-invalid' : '' %>"><label>Início previsto *</label><input name="periodoInicio" type="date" value="<%= campo('periodoInicio', dataCampo(vaga?.periodoInicio)) %>" required aria-invalid="<%= erros?.periodoInicio ? 'true' : 'false' %>"><% if (erros?.periodoInicio) { %><small class="field-error"><%= erros.periodoInicio %></small><% } %></div>
+        <div class="field <%= erros?.periodoFim ? 'field-invalid' : '' %>"><label>Fim previsto *</label><input name="periodoFim" type="date" value="<%= campo('periodoFim', dataCampo(vaga?.periodoFim)) %>" required aria-invalid="<%= erros?.periodoFim ? 'true' : 'false' %>"><% if (erros?.periodoFim) { %><small class="field-error"><%= erros.periodoFim %></small><% } %></div>
+        <div class="field <%= erros?.prazo ? 'field-invalid' : '' %>"><label>Prazo para candidatura *</label><input name="prazo" type="date" value="<%= campo('prazo', dataCampo(vaga?.prazo)) %>" required aria-invalid="<%= erros?.prazo ? 'true' : 'false' %>"><% if (erros?.prazo) { %><small class="field-error"><%= erros.prazo %></small><% } %></div>
+        <label class="check-card field"><input type="checkbox" name="reducaoJornadaAvaliacoes" <%= (formularioReenviado ? campo('reducaoJornadaAvaliacoes') === 'on' : vaga?.reducaoJornadaAvaliacoes !== false) ? 'checked' : '' %>><span>Redução de jornada em avaliações</span></label>
+
+        <div class="field full form-section-title"><h2>Bolsa e benefícios</h2></div>
+        <div class="field <%= erros?.bolsa ? 'field-invalid' : '' %>"><label>Bolsa-auxílio (R$) *</label><input name="bolsa" type="number" min="0" step="0.01" value="<%= campo('bolsa', vaga?.bolsa) %>" required aria-invalid="<%= erros?.bolsa ? 'true' : 'false' %>"><% if (erros?.bolsa) { %><small class="field-error"><%= erros.bolsa %></small><% } %></div>
+        <div class="field <%= erros?.auxilioTransporte ? 'field-invalid' : '' %>"><label>Auxílio-transporte (R$) *</label><input name="auxilioTransporte" type="number" min="0" step="0.01" value="<%= campo('auxilioTransporte', vaga?.auxilioTransporte) %>" required aria-invalid="<%= erros?.auxilioTransporte ? 'true' : 'false' %>"><% if (erros?.auxilioTransporte) { %><small class="field-error"><%= erros.auxilioTransporte %></small><% } %></div>
+        <div class="field full"><label>Outros benefícios</label><input name="outrosBeneficios" value="<%= campo('outrosBeneficios', vaga?.outrosBeneficios) %>"></div>
+
+        <div class="field full form-section-title"><h2>Supervisor da empresa</h2></div>
+        <div class="field <%= erros?.supervisorNome ? 'field-invalid' : '' %>"><label>Nome *</label><input name="supervisorNome" value="<%= campo('supervisorNome', vaga?.supervisor?.nome) %>" required aria-invalid="<%= erros?.supervisorNome ? 'true' : 'false' %>"><% if (erros?.supervisorNome) { %><small class="field-error"><%= erros.supervisorNome %></small><% } %></div>
+        <div class="field <%= erros?.supervisorCargo ? 'field-invalid' : '' %>"><label>Cargo *</label><input name="supervisorCargo" value="<%= campo('supervisorCargo', vaga?.supervisor?.cargo) %>" required aria-invalid="<%= erros?.supervisorCargo ? 'true' : 'false' %>"><% if (erros?.supervisorCargo) { %><small class="field-error"><%= erros.supervisorCargo %></small><% } %></div>
+        <div class="field <%= erros?.supervisorFormacao ? 'field-invalid' : '' %>"><label>Formação</label><input name="supervisorFormacao" value="<%= campo('supervisorFormacao', vaga?.supervisor?.formacao) %>" aria-invalid="<%= erros?.supervisorFormacao ? 'true' : 'false' %>"><% if (erros?.supervisorFormacao) { %><small class="field-error"><%= erros.supervisorFormacao %></small><% } %></div>
+        <div class="field"><label>Experiência na área</label><input name="supervisorExperiencia" value="<%= campo('supervisorExperiencia', vaga?.supervisor?.experiencia) %>"></div>
+        <div class="field"><label>E-mail</label><input name="supervisorEmail" type="email" value="<%= campo('supervisorEmail', vaga?.supervisor?.email) %>"></div>
+        <div class="field"><label>Telefone</label><input name="supervisorTelefone" value="<%= campo('supervisorTelefone', vaga?.supervisor?.telefone) %>"></div>
+        <div class="field <%= erros?.supervisorQuantidadeAtual ? 'field-invalid' : '' %>"><label>Estagiários já acompanhados *</label><input name="supervisorQuantidadeAtual" type="number" min="0" max="10" value="<%= campo('supervisorQuantidadeAtual', vaga?.supervisor?.quantidadeEstagiariosAtuais || 0) %>" required aria-invalid="<%= erros?.supervisorQuantidadeAtual ? 'true' : 'false' %>"><% if (erros?.supervisorQuantidadeAtual) { %><small class="field-error"><%= erros.supervisorQuantidadeAtual %></small><% } %></div>
+
+        <div class="address-fields full" data-address-fields>
+          <div class="form-grid"><%- include('../partials/campos-endereco', { prefixo: 'localizacao', valor: vaga?.localizacao, obrigatorio: modalidadeAtual !== 'REMOTO', tituloEndereco: 'Localização da vaga', ajudaEndereco: 'Obrigatória para vagas presenciais e híbridas.' }) %></div>
+        </div>
+
+        <div class="field full form-actions">
+          <% if (!vaga || ['RASCUNHO','REPROVADA'].includes(vaga.status)) { %><button class="btn btn-secondary" type="submit" name="acao" value="rascunho" formnovalidate>Salvar como rascunho</button><% } %>
+          <button class="btn" type="submit" name="acao" value="enviar"><%= vaga?.status === 'REPROVADA' ? 'Editar e reenviar' : 'Enviar para validação' %></button>
+        </div>
+      </form>
+      <% if (vaga?.imagem?.caminho) { %><form method="post" action="/empresa/vagas/<%= vaga._id %>/imagem/remover" data-confirmar="Remover a imagem atual da vaga?" class="separate-action"><button class="btn btn-danger">Remover imagem</button></form><% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

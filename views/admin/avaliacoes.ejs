@@ -1,0 +1,46 @@
+<%- include('../partials/cabecalho', { titulo: 'Avaliações' }) %>
+
+<section class="section">
+    <div class="container">
+        <div class="page-header">
+            <h1>Avaliações finais</h1>
+            <p class="muted">
+                Consulte avaliações feitas por estudantes e empresas.
+            </p>
+        </div>
+
+        <div class="grid">
+            <% avaliacoes.forEach(a => { %>
+                <article class="card">
+                    <%- include('../partials/estrelas-display', { nota: a.nota }) %>
+
+                    <h3><%= a.vaga?.titulo %></h3>
+
+                    <p>
+                        <strong>Estudante:</strong>
+                        <%= formatarNomeProprio(a.estudante?.usuario?.nome) %>
+                        <br>
+                        <strong>Empresa:</strong>
+                        <%= formatarNomeProprio(a.empresa?.nomeFantasia) %>
+                    </p>
+
+                    <p><%= a.comentario %></p>
+
+                    <small class="muted">
+                        <%= a.tipo.replaceAll('_',' ') %>
+                        · autor: <%= formatarNomeProprio(a.autor?.nome) %>
+                        · <%= formatarData(a.data) %>
+                    </small>
+                </article>
+            <% }) %>
+        </div>
+
+        <% if (!avaliacoes.length) { %>
+            <div class="empty">
+                Nenhuma avaliação registrada.
+            </div>
+        <% } %>
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

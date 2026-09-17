@@ -1,0 +1,14 @@
+<% const etapasLinha = montarLinhaTempoEstagio(candidatura, typeof termo !== 'undefined' ? termo : null); %>
+<ol class="internship-timeline" aria-label="Andamento do processo de estágio">
+  <% etapasLinha.forEach((etapa, indice) => { %>
+    <li class="timeline-step <%= etapa.estado.toLowerCase() %>" aria-current="<%= etapa.estado === 'ATUAL' ? 'step' : 'false' %>">
+      <span class="timeline-marker" aria-hidden="true"><%= etapa.simbolo %></span>
+      <div>
+        <strong><%= indice + 1 %>. <%= etapa.titulo %></strong>
+        <span><%= etapa.descricao %></span>
+        <% if (etapa.data) { %><time datetime="<%= new Date(etapa.data).toISOString() %>"><%= formatarData(etapa.data) %></time><% } %>
+      </div>
+    </li>
+  <% }) %>
+</ol>
+

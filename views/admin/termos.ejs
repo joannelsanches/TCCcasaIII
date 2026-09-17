@@ -1,0 +1,55 @@
+<%- include('../partials/cabecalho', { titulo: 'Termos e documentos' }) %>
+
+<section class="section">
+  <div class="container container-wide">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Validação institucional</span>
+      <h1>Termos e documentos</h1>
+      <p class="muted">A análise de cada documento, a aprovação do termo e o início do estágio são registros distintos.</p>
+    </div>
+
+    <div class="stack">
+      <% termos.forEach(termo => { %>
+        <article class="card term-card">
+          <div class="section-heading">
+            <div><h2><%= formatarNomeProprio(termo.estudante?.usuario?.nome) %></h2><p><%= termo.candidatura?.vaga?.titulo %> · <%= formatarNomeProprio(termo.empresa?.nomeFantasia) %></p></div>
+            <div class="status-group"><span class="badge <%= termo.status.toLowerCase() %>"><%= termo.status.replaceAll('_', ' ') %></span><span class="badge"><%= termo.situacaoEstagio?.replaceAll('_', ' ') %></span></div>
+          </div>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS'].includes(termo.status)) { %><div class="alert aviso"><strong>Rascunho:</strong> ainda não é um documento definitivo e não está pronto para aprovação.</div><% } %>
+          <% if (termo.justificativa) { %><div class="alert erro"><strong>Justificativa registrada:</strong> <%= termo.justificativa %></div><% } %>
+
+          <%- include('../partials/linha-tempo-estagio', { candidatura: termo.candidatura, termo }) %>
+
+          <div class="details-grid">
+            <div><strong>Curso / matrícula</strong><%= termo.curso?.nome || '—' %> · <%= termo.matricula || '—' %></div>
+            <div><strong>Orientador</strong><%= formatarNomeProprio(termo.professorOrientador?.nome || '—') %></div>
+            <div><strong>Supervisor</strong><%= formatarNomeProprio(termo.supervisorEmpresa?.nome || '—') %></div>
+            <div><strong>Seguro</strong><%= termo.seguro?.seguradora || '—' %> · <%= termo.seguro?.numeroApolice || '—' %></div>
+            <div><strong>Período</strong><%= formatarData(termo.periodo?.inicio) %> a <%= formatarData(termo.periodo?.fim) %></div>
+            <div><strong>Jornada</strong><%= termo.jornada?.cargaDiaria || '—' %>h/dia · <%= termo.jornada?.cargaSemanal || '—' %>h/semana</div>
+          </div>
+          <p><strong>Plano de atividades:</strong> <%= termo.planoAtividades %></p>
+
+          <h3>Checklist documental</h3>
+          <%- include('../partials/checklist-documentos', { termo, modo: 'admin' }) %>
+
+          <% if (termo.status === 'PENDENTE') { %>
+            <form method="post" action="/termos/<%= termo._id %>/analisar" class="form-grid term-review">
+              <div class="field full"><label for="justificativa-<%= termo._id %>">Justificativa (obrigatória ao reprovar)</label><textarea id="justificativa-<%= termo._id %>" name="justificativa"><%= termo.justificativa || '' %></textarea></div>
+              <div class="field full"><label>Conferências institucionais *</label><div class="check-grid"><label class="check-card"><input type="checkbox" name="compatibilidadeCursoPpc"><span>Atividades compatíveis com curso e PPC</span></label><label class="check-card"><input type="checkbox" name="jornadaHorarioEscolar"><span>Jornada compatível com horário escolar</span></label><label class="check-card"><input type="checkbox" name="supervisorApto"><span>Supervisor apto e dentro do limite</span></label><label class="check-card"><input type="checkbox" name="instalacoesAvaliadas"><span>Instalações avaliadas</span></label></div></div>
+              <div class="field full form-actions"><button class="btn" name="decisao" value="aprovar">Aprovar termo</button><button class="btn btn-danger" name="decisao" value="reprovar" formnovalidate>Reprovar termo</button></div>
+            </form>
+          <% } %>
+
+          <% if (termo.status === 'APROVADO' && termo.situacaoEstagio === 'NAO_INICIADO') { %><form method="post" action="/termos/<%= termo._id %>/iniciar" data-confirmar="Registrar o início do estágio?" class="separate-action"><button class="btn">Registrar início</button></form><% } %>
+          <% if (termo.status === 'APROVADO' && termo.situacaoEstagio === 'EM_ANDAMENTO') { %><div class="actions"><form method="post" action="/termos/<%= termo._id %>/encerrar" data-confirmar="Registrar o encerramento após conferir relatório e termo de realização?"><button class="btn">Encerrar estágio</button></form><form method="post" action="/termos/<%= termo._id %>/rescindir" class="rescind-form" data-confirmar="Registrar a rescisão do estágio?"><input name="justificativa" placeholder="Motivo da rescisão" required><button class="btn btn-danger">Registrar rescisão</button></form></div><% } %>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!termos.length) { %><div class="empty">Nenhum termo solicitado.</div><% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

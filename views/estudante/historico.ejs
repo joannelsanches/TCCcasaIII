@@ -1,0 +1,60 @@
+<%- include('../partials/cabecalho', { titulo: 'Histórico de estágios' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Histórico de estágios</h1>
+
+            <p class="muted">
+                Registros criados após a aprovação do termo.
+            </p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Vaga</th>
+                        <th>Empresa</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% historico.forEach(h => { %>
+                        <tr>
+                            <td>
+                                <%= h.vaga?.titulo || '—' %>
+                            </td>
+
+                            <td>
+                                <%= formatarNomeProprio(h.empresa?.nomeFantasia || '—') %>
+                            </td>
+
+                            <td>
+                                <%= formatarData(h.dataInicio) %>
+                            </td>
+
+                            <td>
+                                <%= formatarData(h.dataFim) %>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+
+            </table>
+        </div>
+
+        <% if (!historico.length) { %>
+            <div class="empty">
+                Seu histórico ainda está vazio.
+            </div>
+        <% } %>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

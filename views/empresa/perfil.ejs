@@ -1,0 +1,50 @@
+<%- include('../partials/cabecalho', { titulo: 'Perfil da empresa' }) %>
+
+<section class="section">
+  <div class="container">
+    <header class="profile-header card">
+      <% if (empresa.logo?.caminho) { %>
+        <img class="profile-logo" src="/midia/empresas/<%= empresa._id %>/logo" alt="Logo de <%= formatarNomeProprio(empresa.nomeFantasia) %>">
+      <% } else { %>
+        <span class="profile-logo initials" aria-label="Sem logo"><%= iniciais(empresa.nomeFantasia) %></span>
+      <% } %>
+      <div><span class="eyebrow">Empresa</span><h1><%= formatarNomeProprio(empresa.nomeFantasia) %></h1><p class="muted"><%= empresa.razaoSocial %></p></div>
+      <div class="profile-status"><span class="badge <%= empresa.statusCadastro.toLowerCase() %>">Cadastro <%= empresa.statusCadastro %></span><span class="badge <%= (convenio?.status || 'pendente').toLowerCase() %>">Convênio <%= convenio?.status || 'NÃO REGISTRADO' %></span></div>
+    </header>
+
+    <%- include('../partials/progresso-perfil', { conclusaoPerfil }) %>
+
+    <div class="card form-card">
+      <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+      <form method="post" enctype="multipart/form-data" class="form-grid">
+        <div class="field full form-section-title"><h2>Identificação</h2></div>
+        <div class="field <%= erros?.cnpj ? 'field-invalid' : '' %>"><label>CNPJ</label><input name="cnpj" value="<%= valores?.cnpj ?? empresa.cnpj %>" <%= empresa.statusCadastro === 'APROVADO' ? 'disabled' : 'required' %> aria-invalid="<%= erros?.cnpj ? 'true' : 'false' %>"><% if (erros?.cnpj) { %><small class="field-error"><%= erros.cnpj %></small><% } %></div>
+        <div class="field <%= erros?.razaoSocial ? 'field-invalid' : '' %>"><label>Razão social</label><input name="razaoSocial" value="<%= valores?.razaoSocial ?? empresa.razaoSocial %>" <%= empresa.statusCadastro === 'APROVADO' ? 'disabled' : 'required' %> aria-invalid="<%= erros?.razaoSocial ? 'true' : 'false' %>"><% if (erros?.razaoSocial) { %><small class="field-error"><%= erros.razaoSocial %></small><% } %></div>
+        <div class="field <%= erros?.nomeFantasia ? 'field-invalid' : '' %>"><label>Nome fantasia *</label><input name="nomeFantasia" value="<%= valores?.nomeFantasia ?? empresa.nomeFantasia %>" required aria-invalid="<%= erros?.nomeFantasia ? 'true' : 'false' %>"><% if (erros?.nomeFantasia) { %><small class="field-error"><%= erros.nomeFantasia %></small><% } %></div>
+
+        <div class="field full form-section-title"><h2>Contato e responsável</h2></div>
+        <div class="field <%= erros?.telefone ? 'field-invalid' : '' %>"><label>Telefone *</label><input name="telefone" value="<%= valores?.telefone ?? empresa.telefone %>" required aria-invalid="<%= erros?.telefone ? 'true' : 'false' %>"><% if (erros?.telefone) { %><small class="field-error"><%= erros.telefone %></small><% } %></div>
+        <div class="field <%= erros?.emailContato ? 'field-invalid' : '' %>"><label>E-mail de contato *</label><input name="emailContato" type="email" value="<%= valores?.emailContato ?? empresa.emailContato %>" required aria-invalid="<%= erros?.emailContato ? 'true' : 'false' %>"><% if (erros?.emailContato) { %><small class="field-error"><%= erros.emailContato %></small><% } %></div>
+        <div class="field <%= erros?.responsavelNome ? 'field-invalid' : '' %>"><label>Nome do responsável *</label><input name="responsavelNome" value="<%= valores?.responsavelNome ?? empresa.responsavel?.nome ?? '' %>" required aria-invalid="<%= erros?.responsavelNome ? 'true' : 'false' %>"><% if (erros?.responsavelNome) { %><small class="field-error"><%= erros.responsavelNome %></small><% } %></div>
+        <div class="field <%= erros?.responsavelCargo ? 'field-invalid' : '' %>"><label>Cargo do responsável *</label><input name="responsavelCargo" value="<%= valores?.responsavelCargo ?? empresa.responsavel?.cargo ?? '' %>" required aria-invalid="<%= erros?.responsavelCargo ? 'true' : 'false' %>"><% if (erros?.responsavelCargo) { %><small class="field-error"><%= erros.responsavelCargo %></small><% } %></div>
+
+        <%- include('../partials/campos-endereco', { prefixo: 'endereco', valor: empresa.endereco, obrigatorio: true, tituloEndereco: 'Endereço' }) %>
+
+        <div class="field full form-section-title"><h2>Apresentação</h2></div>
+        <div class="field full"><label>Descrição</label><textarea name="descricao"><%= valores?.descricao ?? empresa.descricao ?? '' %></textarea></div>
+        <div class="field full image-field">
+          <label for="logo">Alterar logo</label>
+          <div class="image-preview image-preview-logo" data-preview-box hidden><img alt="Pré-visualização da nova logo" data-preview-image></div>
+          <input id="logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" data-image-input data-preview-target="[data-preview-image]">
+          <small class="help">Ao salvar uma nova logo, a anterior será removida com segurança.</small>
+        </div>
+        <div class="field full"><button class="btn">Salvar alterações</button></div>
+      </form>
+      <% if (empresa.logo?.caminho) { %>
+        <form method="post" action="/empresa/perfil/logo/remover" data-confirmar="Remover a logo atual?" class="separate-action"><button class="btn btn-danger">Remover logo</button></form>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

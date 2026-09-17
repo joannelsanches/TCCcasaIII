@@ -1,0 +1,10 @@
+<%- include('../partials/cabecalho', { titulo: 'Avaliações de desempenho' }) %>
+
+<section class="section"><div class="container">
+  <div class="page-header"><h1>Avaliar estagiário</h1><p class="muted">Cada estudante e vaga pode receber uma única avaliação da empresa.</p></div>
+  <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+  <% if (candidaturas.length) { %><div class="card form-card"><form method="post" action="/avaliacoes" class="form-grid"><div class="field full <%= erros?.candidatura ? 'field-invalid' : '' %>"><label>Estudante e vaga *</label><select name="candidatura" required aria-invalid="<%= erros?.candidatura ? 'true' : 'false' %>"><% candidaturas.forEach(c => { %><option value="<%= c._id %>" <%= String(valores?.candidatura || '') === String(c._id) ? 'selected' : '' %>><%= formatarNomeProprio(c.estudante.usuario.nome) %> — <%= c.vaga.titulo %></option><% }) %></select><% if (erros?.candidatura) { %><small class="field-error"><%= erros.candidatura %></small><% } %></div><%- include('../partials/estrelas-form', { identificador: 'empresa' }) %><div class="field full <%= erros?.comentario ? 'field-invalid' : '' %>"><label>Comentário *</label><textarea name="comentario" required aria-invalid="<%= erros?.comentario ? 'true' : 'false' %>"><%= valores?.comentario || '' %></textarea><% if (erros?.comentario) { %><small class="field-error"><%= erros.comentario %></small><% } %></div><div class="field full"><button class="btn">Registrar avaliação</button></div></form></div><% } else { %><div class="empty">Não há estágio aprovado pendente de avaliação pela empresa.</div><% } %>
+  <div class="grid spaced"><% avaliacoes.forEach(a => { %><article class="card"><%- include('../partials/estrelas-display', { nota: a.nota }) %><h3><%= formatarNomeProprio(a.estudante?.usuario?.nome) %></h3><p><%= a.comentario %></p><small class="muted"><%= a.vaga?.titulo %> · <%= formatarData(a.data) %></small></article><% }) %></div>
+</div></section>
+
+<%- include('../partials/rodape') %>

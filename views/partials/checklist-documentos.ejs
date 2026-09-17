@@ -1,0 +1,43 @@
+<% const itensChecklist = montarChecklistDocumentos(termo); %>
+<div class="document-checklist" aria-label="Checklist de documentos do estágio">
+  <% itensChecklist.forEach(item => { const documento = item.documento; %>
+    <article class="document-item status-<%= item.status.toLowerCase() %>">
+      <div class="document-status-symbol" aria-hidden="true"><%= item.status === 'APROVADO' ? '✓' : item.status === 'REJEITADO' ? '×' : item.status === 'FALTANDO' ? '○' : '●' %></div>
+      <div class="document-info">
+        <div class="document-title">
+          <strong><%= item.nome %></strong>
+          <span class="badge <%= item.status.toLowerCase() %>"><%= item.status.replaceAll('_', ' ') %></span>
+          <span class="document-requirement"><%= item.obrigatorio ? 'Obrigatório' : 'Opcional' %></span>
+        </div>
+        <% if (item.especial && item.arquivo?.caminho) { %>
+          <p><a href="/termos/<%= termo._id %>/tce-assinado">Visualizar PDF assinado</a> · enviado em <%= formatarData(item.arquivo.dataEnvio) %></p>
+        <% } else if (documento?.caminho) { %>
+          <p><a href="/termos/documentos/<%= documento._id %>">Visualizar <%= documento.nomeOriginal || 'documento' %></a> · enviado em <%= formatarData(documento.dataEnvio) %></p>
+          <% if (documento.dataAnalise) { %><p class="muted">Analisado em <%= formatarData(documento.dataAnalise) %></p><% } %>
+        <% } else { %><p class="muted">Arquivo ainda não enviado.</p><% } %>
+        <% if (documento?.motivoRejeicao) { %><p class="field-error"><strong>Motivo:</strong> <%= documento.motivoRejeicao %></p><% } %>
+
+        <% if (modo === 'estudante' && documento?.status === 'REJEITADO') { %>
+          <form method="post" action="/termos/<%= termo._id %>/documentos" enctype="multipart/form-data" class="inline-upload">
+            <input type="hidden" name="tipoDocumento" value="<%= documento.tipo %>">
+            <input type="hidden" name="nomeDocumento" value="<%= documento.nome || item.nome %>">
+            <label for="substituir-<%= documento._id %>">Substituir PDF rejeitado</label>
+            <input id="substituir-<%= documento._id %>" type="file" name="documento" accept="application/pdf,.pdf" required>
+            <button class="btn btn-small btn-secondary">Enviar substituição</button>
+          </form>
+        <% } %>
+
+        <% if (modo === 'admin' && documento?.caminho && ['ENVIADO','EM_ANALISE','APROVADO','REJEITADO'].includes(item.status)) { %>
+          <div class="document-review-actions">
+            <form method="post" action="/termos/<%= termo._id %>/documentos/<%= documento._id %>/validar"><button class="btn btn-small" name="decisao" value="aprovar">Aprovar documento</button></form>
+            <form method="post" action="/termos/<%= termo._id %>/documentos/<%= documento._id %>/validar" class="rejection-form">
+              <label class="sr-only" for="motivo-<%= documento._id %>">Motivo da rejeição</label>
+              <input id="motivo-<%= documento._id %>" name="motivoRejeicao" placeholder="Motivo da rejeição" required>
+              <button class="btn btn-small btn-danger" name="decisao" value="reprovar">Rejeitar</button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </article>
+  <% }) %>
+</div>

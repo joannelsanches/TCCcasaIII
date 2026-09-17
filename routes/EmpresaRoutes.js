@@ -1,0 +1,12 @@
+import express from 'express';
+import EmpresaController from '../controllers/EmpresaController.js';
+import { autenticado, autorizar } from '../middlewares/autenticacao.js';
+import { uploadLogoEmpresa } from '../config/upload.js';
+const router = express.Router();
+router.get('/empresa', autenticado, autorizar('EMPRESA'), EmpresaController.painel);
+router.get('/empresa/perfil', autenticado, autorizar('EMPRESA'), EmpresaController.perfil);
+router.post('/empresa/perfil', autenticado, autorizar('EMPRESA'), uploadLogoEmpresa.single('logo'), EmpresaController.atualizarPerfil);
+router.post('/empresa/perfil/logo/remover', autenticado, autorizar('EMPRESA'), EmpresaController.removerLogo);
+router.get('/empresa/candidatos/:vagaId', autenticado, autorizar('EMPRESA'), EmpresaController.candidatos);
+router.get('/empresa/candidato/:id', autenticado, autorizar('EMPRESA'), EmpresaController.candidato);
+export default router;

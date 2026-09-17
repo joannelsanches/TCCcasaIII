@@ -1,0 +1,43 @@
+<%- include('../partials/cabecalho', { titulo: 'Termos da empresa' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Acompanhamento</span>
+      <h1>Termos de compromisso</h1>
+      <p class="muted">Consulte o andamento institucional e os documentos dos estudantes selecionados nas suas vagas.</p>
+    </div>
+
+    <div class="stack">
+      <% termos.forEach(termo => { %>
+        <article class="card term-card">
+          <div class="section-heading">
+            <div><h2><%= formatarNomeProprio(termo.estudante?.usuario?.nome) %></h2><p class="muted"><%= termo.candidatura?.vaga?.titulo %> · solicitado em <%= formatarData(termo.dataSolicitacao) %></p></div>
+            <div class="status-group"><span class="badge <%= termo.status.toLowerCase() %>"><%= termo.status.replaceAll('_', ' ') %></span><span class="badge"><%= termo.situacaoEstagio?.replaceAll('_', ' ') %></span></div>
+          </div>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS'].includes(termo.status)) { %><div class="alert aviso"><strong>Rascunho:</strong> o documento ainda não foi aprovado pelo IFSul.</div><% } %>
+          <% if (termo.justificativa) { %><div class="alert erro"><strong>Correção solicitada:</strong> <%= termo.justificativa %></div><% } %>
+
+          <%- include('../partials/linha-tempo-estagio', { candidatura: termo.candidatura, termo }) %>
+
+          <div class="details-grid">
+            <div><strong>Curso</strong><%= termo.curso?.nome || '—' %></div>
+            <div><strong>Professor orientador</strong><%= formatarNomeProprio(termo.professorOrientador?.nome || '—') %></div>
+            <div><strong>Supervisor</strong><%= formatarNomeProprio(termo.supervisorEmpresa?.nome || '—') %></div>
+            <div><strong>Período</strong><%= formatarData(termo.periodo?.inicio) %> a <%= formatarData(termo.periodo?.fim) %></div>
+            <div><strong>Jornada</strong><%= termo.jornada?.cargaDiaria || '—' %>h/dia · <%= termo.jornada?.cargaSemanal || '—' %>h/semana</div>
+            <div><strong>Próximo relatório</strong><%= termo.proximoRelatorio ? formatarData(termo.proximoRelatorio) : 'Ainda não definido' %></div>
+          </div>
+
+          <h3>Checklist documental</h3>
+          <%- include('../partials/checklist-documentos', { termo, modo: 'empresa' }) %>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!termos.length) { %><div class="empty">Nenhum termo relacionado à empresa.</div><% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

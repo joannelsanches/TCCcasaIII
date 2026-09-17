@@ -1,0 +1,89 @@
+<%- include('../partials/cabecalho', { titulo: 'Termos de compromisso' }) %>
+<% const dataInput = (data) => data ? new Date(data).toISOString().slice(0, 10) : ''; %>
+
+<section class="section">
+  <div class="container">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Formalização do estágio</span>
+      <h1>Termos de compromisso</h1>
+      <p class="muted">O registro inicial é um rascunho. O TCE só é aprovado após assinaturas, documentos e análise institucional.</p>
+    </div>
+    <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+
+    <% if (selecionadas.length) { %>
+      <details class="card form-card term-create" open>
+        <summary><strong>Criar rascunho de termo</strong></summary>
+        <form method="post" action="/termos" class="form-grid spaced">
+          <div class="field full <%= erros?.candidatura ? 'field-invalid' : '' %>"><label for="candidatura">Candidatura selecionada *</label><select id="candidatura" name="candidatura" required aria-invalid="<%= erros?.candidatura ? 'true' : 'false' %>"><% selecionadas.forEach(candidatura => { %><option value="<%= candidatura._id %>" <%= String(valores?.candidatura || '') === String(candidatura._id) ? 'selected' : '' %>><%= candidatura.vaga.titulo %> — <%= formatarNomeProprio(candidatura.vaga.empresa?.nomeFantasia) %></option><% }) %></select><% if (erros?.candidatura) { %><small class="field-error"><%= erros.candidatura %></small><% } %></div>
+          <div class="field full form-section-title"><h3>Professor orientador</h3></div>
+          <div class="field <%= erros?.orientadorNome ? 'field-invalid' : '' %>"><label>Nome *</label><input name="orientadorNome" value="<%= valores?.orientadorNome || '' %>" required aria-invalid="<%= erros?.orientadorNome ? 'true' : 'false' %>"><% if (erros?.orientadorNome) { %><small class="field-error"><%= erros.orientadorNome %></small><% } %></div><div class="field <%= erros?.orientadorEmail ? 'field-invalid' : '' %>"><label>E-mail *</label><input name="orientadorEmail" type="email" value="<%= valores?.orientadorEmail || '' %>" required aria-invalid="<%= erros?.orientadorEmail ? 'true' : 'false' %>"><% if (erros?.orientadorEmail) { %><small class="field-error"><%= erros.orientadorEmail %></small><% } %></div><div class="field"><label>Cargo</label><input name="orientadorCargo" value="<%= valores?.orientadorCargo || '' %>"></div><div class="field"><label>Formação</label><input name="orientadorFormacao" value="<%= valores?.orientadorFormacao || '' %>"></div><div class="field"><label>Telefone</label><input name="orientadorTelefone" value="<%= valores?.orientadorTelefone || '' %>"></div>
+          <div class="field full form-section-title"><h3>Seguro contra acidentes pessoais</h3></div>
+          <div class="field <%= erros?.seguroResponsavel ? 'field-invalid' : '' %>"><label>Responsável *</label><select name="seguroResponsavel" required><option value="CONCEDENTE" <%= valores?.seguroResponsavel === 'CONCEDENTE' ? 'selected' : '' %>>Empresa concedente</option><option value="INSTITUICAO" <%= valores?.seguroResponsavel === 'INSTITUICAO' ? 'selected' : '' %>>Instituição de ensino</option><option value="ESTUDANTE" <%= valores?.seguroResponsavel === 'ESTUDANTE' ? 'selected' : '' %>>Estudante</option></select><% if (erros?.seguroResponsavel) { %><small class="field-error"><%= erros.seguroResponsavel %></small><% } %></div><div class="field <%= erros?.seguradora ? 'field-invalid' : '' %>"><label>Seguradora *</label><input name="seguradora" value="<%= valores?.seguradora || '' %>" required><% if (erros?.seguradora) { %><small class="field-error"><%= erros.seguradora %></small><% } %></div><div class="field <%= erros?.numeroApolice ? 'field-invalid' : '' %>"><label>Número da apólice *</label><input name="numeroApolice" value="<%= valores?.numeroApolice || '' %>" required><% if (erros?.numeroApolice) { %><small class="field-error"><%= erros.numeroApolice %></small><% } %></div><div class="field <%= erros?.seguroVigenciaInicio ? 'field-invalid' : '' %>"><label>Início da vigência *</label><input name="seguroVigenciaInicio" type="date" value="<%= valores?.seguroVigenciaInicio || '' %>" required><% if (erros?.seguroVigenciaInicio) { %><small class="field-error"><%= erros.seguroVigenciaInicio %></small><% } %></div><div class="field <%= erros?.seguroVigenciaFim ? 'field-invalid' : '' %>"><label>Fim da vigência *</label><input name="seguroVigenciaFim" type="date" value="<%= valores?.seguroVigenciaFim || '' %>" required><% if (erros?.seguroVigenciaFim) { %><small class="field-error"><%= erros.seguroVigenciaFim %></small><% } %></div>
+          <div class="field full form-section-title"><h3>Representante legal</h3><small class="help">Preencha somente quando o estudante for menor de 18 anos na data prevista de início.</small></div><div class="field <%= erros?.representanteLegalNome ? 'field-invalid' : '' %>"><label>Nome</label><input name="representanteLegalNome" value="<%= valores?.representanteLegalNome || '' %>"><% if (erros?.representanteLegalNome) { %><small class="field-error"><%= erros.representanteLegalNome %></small><% } %></div><div class="field <%= erros?.representanteLegalCpf ? 'field-invalid' : '' %>"><label>CPF</label><input name="representanteLegalCpf" inputmode="numeric" value="<%= valores?.representanteLegalCpf || '' %>"><% if (erros?.representanteLegalCpf) { %><small class="field-error"><%= erros.representanteLegalCpf %></small><% } %></div>
+          <div class="field full"><button class="btn">Criar rascunho</button></div>
+        </form>
+      </details>
+    <% } %>
+
+    <div class="stack spaced">
+      <% termos.forEach(termo => { const assinatura = (papel) => termo.assinaturas?.find(item => item.papel === papel) || {}; %>
+        <article class="card term-card">
+          <div class="section-heading">
+            <div><span class="tag"><%= termo.modalidade?.replaceAll('_', ' ') || 'ESTÁGIO' %></span><h2><%= termo.candidatura?.vaga?.titulo %></h2><p class="muted">Criado em <%= formatarData(termo.dataSolicitacao) %> · estágio <%= termo.situacaoEstagio?.replaceAll('_', ' ') %></p></div>
+            <span class="badge <%= termo.status.toLowerCase() %>"><%= termo.status.replaceAll('_', ' ') %></span>
+          </div>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS'].includes(termo.status)) { %><div class="alert aviso"><strong>Rascunho — ainda não é documento definitivo.</strong> Complete os arquivos e signatários antes de enviar para análise.</div><% } %>
+          <% if (termo.justificativa) { %><div class="alert erro"><strong>Correção solicitada:</strong> <%= termo.justificativa %></div><% } %>
+
+          <%- include('../partials/linha-tempo-estagio', { candidatura: termo.candidatura, termo }) %>
+
+          <div class="details-grid">
+            <div><strong>Orientador</strong><%= formatarNomeProprio(termo.professorOrientador?.nome || '—') %></div>
+            <div><strong>Supervisor</strong><%= formatarNomeProprio(termo.supervisorEmpresa?.nome || '—') %></div>
+            <div><strong>Período</strong><%= formatarData(termo.periodo?.inicio) %> a <%= formatarData(termo.periodo?.fim) %></div>
+            <div><strong>Jornada</strong><%= termo.jornada?.cargaDiaria || '—' %>h/dia · <%= termo.jornada?.cargaSemanal || '—' %>h/semana</div>
+            <div><strong>Seguro</strong><%= termo.seguro?.seguradora || '—' %> · <%= termo.seguro?.numeroApolice || '—' %></div>
+            <div><strong>Próximo relatório</strong><%= termo.proximoRelatorio ? formatarData(termo.proximoRelatorio) : 'Ainda não definido' %></div>
+          </div>
+          <p><strong>Plano de atividades:</strong> <%= termo.planoAtividades %></p>
+
+          <h3>Checklist documental</h3>
+          <%- include('../partials/checklist-documentos', { termo, modo: 'estudante' }) %>
+
+          <% if (['RASCUNHO','AGUARDANDO_ASSINATURAS','REPROVADO'].includes(termo.status)) { %>
+            <details class="subform-panel" <%= !termo.tceAssinado?.caminho ? 'open' : '' %>>
+              <summary><strong><%= termo.tceAssinado?.caminho ? 'Substituir TCE assinado ou atualizar signatários' : 'Enviar o PDF real do TCE assinado' %></strong></summary>
+              <p class="help">O StartIF não assina digitalmente. Anexe aqui o documento assinado fora do sistema ou pela plataforma oficial.</p>
+              <form method="post" action="/termos/<%= termo._id %>/tce-assinado" enctype="multipart/form-data" class="form-grid">
+                <div class="field full"><label>TCE assinado em PDF *</label><input type="file" name="tceAssinado" accept="application/pdf,.pdf" required></div>
+                <div class="field full form-section-title"><h4>Assinaturas registradas</h4></div>
+                <div class="field"><label>Estudante *</label><input name="assinaturaEstudanteNome" value="<%= assinatura('ESTUDANTE').nome || '' %>" required></div><div class="field"><label>Data *</label><input name="assinaturaEstudanteData" type="date" value="<%= dataInput(assinatura('ESTUDANTE').dataAssinatura) %>" required></div>
+                <div class="field"><label>Representante da empresa *</label><input name="assinaturaEmpresaNome" value="<%= assinatura('EMPRESA').nome || '' %>" required></div><div class="field"><label>Data *</label><input name="assinaturaEmpresaData" type="date" value="<%= dataInput(assinatura('EMPRESA').dataAssinatura) %>" required></div><div class="field"><label>Função na empresa</label><input name="assinaturaEmpresaFuncao" value="<%= assinatura('EMPRESA').funcao || '' %>"></div>
+                <div class="field"><label>Representante da instituição *</label><input name="assinaturaInstituicaoNome" value="<%= assinatura('INSTITUICAO').nome || '' %>" required></div><div class="field"><label>Data *</label><input name="assinaturaInstituicaoData" type="date" value="<%= dataInput(assinatura('INSTITUICAO').dataAssinatura) %>" required></div><div class="field"><label>Função na instituição</label><input name="assinaturaInstituicaoFuncao" value="<%= assinatura('INSTITUICAO').funcao || '' %>"></div>
+                <% if (termo.representanteLegal?.nome) { %><div class="field"><label>Responsável legal *</label><input name="assinaturaResponsavelNome" value="<%= assinatura('RESPONSAVEL_LEGAL').nome || termo.representanteLegal.nome %>" required></div><div class="field"><label>Data *</label><input name="assinaturaResponsavelData" type="date" value="<%= dataInput(assinatura('RESPONSAVEL_LEGAL').dataAssinatura) %>" required></div><% } %>
+                <div class="field full"><button class="btn btn-secondary">Salvar TCE e assinaturas</button></div>
+              </form>
+            </details>
+
+            <details class="subform-panel">
+              <summary><strong>Enviar outro documento do checklist</strong></summary>
+              <form method="post" action="/termos/<%= termo._id %>/documentos" enctype="multipart/form-data" class="form-grid">
+                <div class="field"><label>Tipo *</label><select name="tipoDocumento" required><% [['PLANO_ATIVIDADES','Plano de atividades'],['APOLICE_SEGURO','Apólice do seguro'],['COMPROVANTE_MATRICULA','Comprovante de matrícula'],['AVALIACAO_INSTALACOES','Avaliação das instalações'],['RELATORIO','Relatório'],['TERMO_ADITIVO','Termo aditivo'],['TERMO_REALIZACAO','Termo de realização'],['TERMO_RESCISAO','Termo de rescisão'],['OUTRO','Outro']].forEach(([valor,rotulo]) => { %><option value="<%= valor %>"><%= rotulo %></option><% }) %></select></div>
+                <div class="field"><label>Descrição *</label><input name="nomeDocumento" required></div>
+                <div class="field"><label>Arquivo PDF *</label><input type="file" name="documento" accept="application/pdf,.pdf" required></div>
+                <div class="field action-field"><button class="btn btn-secondary">Enviar PDF</button></div>
+              </form>
+            </details>
+
+            <form method="post" action="/termos/<%= termo._id %>/enviar-analise" data-confirmar="Enviar o TCE e o checklist para análise institucional?" class="separate-action"><button class="btn">Enviar para análise</button></form>
+          <% } %>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!termos.length && !selecionadas.length) { %><div class="empty">Quando uma candidatura for selecionada, você poderá iniciar o termo aqui.</div><% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

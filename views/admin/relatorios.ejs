@@ -1,0 +1,162 @@
+<%- include('../partials/cabecalho', { titulo: 'Relatórios' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <h1>Relatório de estágios e candidaturas</h1>
+            <p class="muted">
+                Filtre por curso, empresa, período e status.
+            </p>
+        </div>
+
+        <form method="get" class="card filter-bar">
+
+            <div class="field">
+                <label>Curso</label>
+
+                <select name="curso">
+                    <option value="">Todos</option>
+
+                    <% cursos.forEach(c => { %>
+                        <option
+                            value="<%= c._id %>"
+                            <%= String(filtros.curso || '') === String(c._id) ? 'selected' : '' %>
+                        >
+                            <%= c.nome %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Empresa</label>
+
+                <select name="empresa">
+                    <option value="">Todas</option>
+
+                    <% empresas.forEach(e => { %>
+                        <option
+                            value="<%= e._id %>"
+                            <%= String(filtros.empresa || '') === String(e._id) ? 'selected' : '' %>
+                        >
+                            <%= formatarNomeProprio(e.nomeFantasia) %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Status</label>
+
+                <select name="status">
+                    <option value="">Todos</option>
+
+                    <% ['EM_ANALISE','ENTREVISTA','AGUARDANDO_DOCUMENTOS','SELECIONADO','NAO_SELECIONADO','CANCELADO'].forEach(s => { %>
+                        <option <%= filtros.status == s ? 'selected' : '' %>>
+                            <%= s %>
+                        </option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>De</label>
+                <input
+                    type="date"
+                    name="inicio"
+                    value="<%= filtros.inicio || '' %>"
+                >
+            </div>
+
+            <div class="field">
+                <label>Até</label>
+                <input
+                    type="date"
+                    name="fim"
+                    value="<%= filtros.fim || '' %>"
+                >
+            </div>
+
+            <button class="btn">
+                Filtrar
+            </button>
+
+        </form>
+
+        <div class="section-heading" style="margin-top:25px">
+
+            <h2>
+                <%= candidaturas.length %> registro(s)
+            </h2>
+
+            <a
+                class="btn btn-secondary"
+                href="?<%= new URLSearchParams({...filtros, formato:'csv'}).toString() %>"
+            >
+                Baixar CSV
+            </a>
+
+        </div>
+
+        <div class="table-wrap">
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Estudante</th>
+                        <th>Curso</th>
+                        <th>Empresa</th>
+                        <th>Vaga</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% candidaturas.forEach(c => { %>
+                        <tr>
+
+                            <td>
+                                <%= formatarNomeProprio(c.estudante.usuario.nome) %>
+                            </td>
+
+                            <td>
+                                <%= c.estudante.curso?.nome %>
+                            </td>
+
+                            <td>
+                                <%= formatarNomeProprio(c.vaga.empresa?.nomeFantasia) %>
+                            </td>
+
+                            <td>
+                                <%= c.vaga.titulo %>
+                            </td>
+
+                            <td>
+                                <span class="badge <%= c.status.toLowerCase() %>">
+                                    <%= c.status.replaceAll('_',' ') %>
+                                </span>
+                            </td>
+
+                            <td>
+                                <%= formatarData(c.dataCandidatura) %>
+                            </td>
+
+                        </tr>
+                    <% }) %>
+                </tbody>
+
+            </table>
+        </div>
+
+        <% if (!candidaturas.length) { %>
+            <div class="empty">
+                Nenhum registro para os filtros escolhidos.
+            </div>
+        <% } %>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

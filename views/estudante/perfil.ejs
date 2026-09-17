@@ -1,0 +1,56 @@
+<%- include('../partials/cabecalho', { titulo: 'Perfil acadêmico' }) %>
+
+<section class="section">
+  <div class="container">
+    <header class="profile-header card">
+      <% if (estudante.fotoPerfil?.caminho) { %>
+        <img class="profile-photo" src="/midia/estudantes/<%= estudante._id %>/foto" alt="Foto de <%= formatarNomeProprio(estudante.usuario.nome) %>">
+      <% } else { %>
+        <span class="profile-photo initials"><%= iniciais(estudante.usuario.nome) %></span>
+      <% } %>
+      <div><span class="eyebrow">Estudante</span><h1><%= formatarNomeProprio(estudante.usuario.nome) %></h1><p class="muted"><%= estudante.curso?.nome %> · <%= estudante.campus?.nome %></p></div>
+    </header>
+
+    <%- include('../partials/progresso-perfil', { conclusaoPerfil }) %>
+
+    <div class="split profile-layout">
+      <div class="card form-card">
+        <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+        <form method="post" enctype="multipart/form-data" class="form-grid">
+          <div class="field full form-section-title"><h2>Identificação</h2></div>
+          <div class="field"><label>Nome</label><input value="<%= formatarNomeProprio(estudante.usuario.nome) %>" disabled></div>
+          <div class="field"><label>CPF</label><input value="<%= estudante.cpf %>" disabled></div>
+          <div class="field"><label>Matrícula</label><input value="<%= estudante.matricula %>" disabled></div>
+          <div class="field"><label>Matrícula regular</label><input value="<%= estudante.matriculaRegular ? 'Sim' : 'Não' %>" disabled></div>
+          <div class="field"><label>Data de nascimento</label><input name="dataNascimento" type="date" value="<%= valores?.dataNascimento ?? (estudante.dataNascimento ? new Date(estudante.dataNascimento).toISOString().slice(0,10) : '') %>"></div>
+          <div class="field"><label>Telefone</label><input name="telefone" value="<%= valores?.telefone ?? estudante.telefone ?? '' %>"></div>
+
+          <div class="field full form-section-title"><h2>Dados acadêmicos</h2></div>
+          <div class="field <%= erros?.curso ? 'field-invalid' : '' %>"><label>Curso *</label><select name="curso" required aria-invalid="<%= erros?.curso ? 'true' : 'false' %>"><% cursos.forEach(c => { %><option value="<%= c._id %>" <%= String(valores?.curso ?? estudante.curso?._id) === String(c._id) ? 'selected' : '' %>><%= c.nome %></option><% }) %></select><% if (erros?.curso) { %><small class="field-error"><%= erros.curso %></small><% } %></div>
+          <div class="field <%= erros?.campus ? 'field-invalid' : '' %>"><label>Campus *</label><select name="campus" required aria-invalid="<%= erros?.campus ? 'true' : 'false' %>"><% campi.forEach(c => { %><option value="<%= c._id %>" <%= String(valores?.campus ?? estudante.campus?._id) === String(c._id) ? 'selected' : '' %>><%= c.nome %></option><% }) %></select><% if (erros?.campus) { %><small class="field-error"><%= erros.campus %></small><% } %></div>
+          <div class="field <%= erros?.semestre ? 'field-invalid' : '' %>"><label>Semestre/período</label><input name="semestre" type="number" min="1" max="20" value="<%= valores?.semestre ?? estudante.semestre ?? '' %>" aria-invalid="<%= erros?.semestre ? 'true' : 'false' %>"><% if (erros?.semestre) { %><small class="field-error"><%= erros.semestre %></small><% } %></div>
+          <div class="field"><label>Turno</label><select name="turno"><option value="">Selecione</option><% ['MANHÃ','TARDE','NOITE','INTEGRAL'].forEach(t => { %><option value="<%= t %>" <%= (valores?.turno ?? estudante.turno) === t ? 'selected' : '' %>><%= t %></option><% }) %></select></div>
+          <div class="field full"><label>Disponibilidade</label><textarea name="disponibilidade"><%= valores?.disponibilidade ?? estudante.disponibilidade ?? '' %></textarea></div>
+          <div class="field full"><label>Competências</label><input name="competencias" value="<%= valores?.competencias ?? estudante.competencias?.join(', ') ?? '' %>"><small class="help">Separe por vírgulas.</small></div>
+
+          <%- include('../partials/campos-endereco', { prefixo: 'endereco', valor: estudante.endereco, obrigatorio: false, tituloEndereco: 'Endereço (opcional)', ajudaEndereco: 'Se começar a preencher, informe todos os campos principais.' }) %>
+
+          <div class="field full form-section-title"><h2>Foto de perfil</h2></div>
+          <div class="field full image-field">
+            <div class="image-preview" data-preview-box hidden><img alt="Pré-visualização da foto" data-preview-image></div>
+            <input type="file" name="fotoPerfil" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" data-image-input data-preview-target="[data-preview-image]">
+            <small class="help">JPG, PNG ou WebP. A foto anterior só é removida após salvar.</small>
+          </div>
+          <div class="field full"><button class="btn">Salvar perfil</button></div>
+        </form>
+        <% if (estudante.fotoPerfil?.caminho) { %>
+          <form method="post" action="/estudante/perfil/foto/remover" data-confirmar="Remover a foto de perfil?" class="separate-action"><button class="btn btn-danger">Remover foto</button></form>
+        <% } %>
+      </div>
+
+      <aside class="card"><h2>Currículo</h2><% if (estudante.curriculo?.caminho) { %><p><strong><%= estudante.curriculo.nomeOriginal %></strong></p><p class="muted">Enviado em <%= formatarData(estudante.curriculo.dataEnvio) %></p><a href="/estudantes/<%= estudante._id %>/curriculo">Baixar meu currículo</a><% } else { %><p class="muted">Você ainda não enviou um currículo.</p><% } %><form method="post" action="/estudante/curriculo" enctype="multipart/form-data" class="stack spaced"><div class="field"><label>Currículo em PDF</label><input type="file" name="curriculo" accept="application/pdf,.pdf" required><small class="help">Somente PDF.</small></div><button class="btn"><%= estudante.curriculo?.caminho ? 'Atualizar currículo' : 'Enviar currículo' %></button></form></aside>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

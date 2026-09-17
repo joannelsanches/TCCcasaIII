@@ -1,0 +1,29 @@
+{
+  "name": "startif",
+  "version": "1.0.0",
+  "description": "Plataforma de estágios do IFSul Campus Bagé",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "criar-admin": "node scripts/criar-admin.js",
+    "demo": "node scripts/dados-demo.js",
+    "migrar": "node scripts/migrar-dados.js",
+    "migrar:simular": "node scripts/migrar-dados.js --simular",
+    "atualizar-prazos": "node scripts/atualizar-prazos.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.4.2",
+    "ejs": "^3.1.10",
+    "express": "^4.22.2",
+    "express-session": "^1.18.2",
+    "mongodb": "^7.6.0",
+    "mongoose": "^8.24.4",
+    "multer": "^2.2.0",
+    "nodemailer": "^10.0.10"
+  },
+  "license": "ISC"
+}

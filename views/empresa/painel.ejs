@@ -1,0 +1,76 @@
+<%- include('../partials/cabecalho', { titulo: 'Painel da empresa' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <div class="dashboard-identity">
+                <% if (empresa.logo?.caminho) { %><img class="profile-logo small" src="/midia/empresas/<%= empresa._id %>/logo" alt="Logo de <%= formatarNomeProprio(empresa.nomeFantasia) %>"><% } else { %><span class="profile-logo initials small"><%= iniciais(empresa.nomeFantasia) %></span><% } %>
+                <div>
+            <span class="eyebrow">Área da empresa</span>
+
+            <h1>
+                <%= formatarNomeProprio(empresa.nomeFantasia) %>
+            </h1>
+
+            <p class="muted">
+                Cadastro
+                <span class="badge <%= empresa.statusCadastro.toLowerCase() %>">
+                    <%= empresa.statusCadastro %>
+                </span>
+            </p>
+                </div>
+            </div>
+        </div>
+
+        <%- include('../partials/progresso-perfil', { conclusaoPerfil }) %>
+
+        <div class="metrics">
+
+            <div class="metric">
+                <strong><%= vagasAbertas %></strong>
+                <span>vagas abertas</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= candidaturas %></strong>
+                <span>candidaturas</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= convenio?.status || '—' %></strong>
+                <span>convênio</span>
+                <% if (convenio?.pdfAssinado?.caminho) { %><a href="/convenios/<%= convenio._id %>/pdf">Ver PDF assinado</a><% } %>
+            </div>
+
+        </div>
+
+        <div class="grid" style="margin-top:35px">
+
+            <a class="card" href="/empresa/vagas/nova">
+                <h2>Publicar vaga</h2>
+                <p>
+                    Cadastre uma oportunidade para validação do IFSul.
+                </p>
+            </a>
+
+            <a class="card" href="/empresa/vagas">
+                <h2>Gerenciar vagas</h2>
+                <p>
+                    Edite anúncios e veja os estudantes candidatos.
+                </p>
+            </a>
+
+            <a class="card" href="/termos">
+                <h2>Acompanhar termos</h2>
+                <p>
+                    Consulte os termos dos estudantes selecionados.
+                </p>
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>

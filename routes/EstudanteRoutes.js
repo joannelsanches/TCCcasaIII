@@ -1,0 +1,14 @@
+import express from 'express';
+import EstudanteController from '../controllers/EstudanteController.js';
+import { uploadCurriculo, uploadFotoPerfil } from '../config/upload.js';
+import { autenticado, autorizar } from '../middlewares/autenticacao.js';
+const router = express.Router();
+router.get('/estudante', autenticado, autorizar('ESTUDANTE'), EstudanteController.painel);
+router.get('/estudante/perfil', autenticado, autorizar('ESTUDANTE'), EstudanteController.perfil);
+router.post('/estudante/perfil', autenticado, autorizar('ESTUDANTE'), uploadFotoPerfil.single('fotoPerfil'), EstudanteController.atualizarPerfil);
+router.post('/estudante/perfil/foto/remover', autenticado, autorizar('ESTUDANTE'), EstudanteController.removerFoto);
+router.post('/estudante/curriculo', autenticado, autorizar('ESTUDANTE'), uploadCurriculo.single('curriculo'), EstudanteController.enviarCurriculo);
+router.get('/estudante/candidaturas', autenticado, autorizar('ESTUDANTE'), EstudanteController.candidaturas);
+router.get('/estudante/historico', autenticado, autorizar('ESTUDANTE'), EstudanteController.historico);
+router.get('/estudantes/:id/curriculo', autenticado, EstudanteController.curriculoProtegido);
+export default router;

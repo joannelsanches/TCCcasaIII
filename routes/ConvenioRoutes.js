@@ -1,0 +1,12 @@
+import express from 'express';
+import ConvenioController from '../controllers/ConvenioController.js';
+import { autenticado, autorizar } from '../middlewares/autenticacao.js';
+import { uploadDocumento } from '../config/upload.js';
+const router = express.Router();
+router.get('/admin/convenios', autenticado, autorizar('ADMIN'), ConvenioController.listar);
+router.post('/admin/convenios', autenticado, autorizar('ADMIN'), uploadDocumento.single('pdfAssinado'), ConvenioController.salvar);
+router.post('/admin/convenios/:id/pdf', autenticado, autorizar('ADMIN'), uploadDocumento.single('pdfAssinado'), ConvenioController.atualizarDocumento);
+router.post('/admin/convenios/:id/enviar-analise', autenticado, autorizar('ADMIN'), ConvenioController.enviarAnalise);
+router.post('/admin/convenios/:id/status', autenticado, autorizar('ADMIN'), ConvenioController.status);
+router.get('/convenios/:id/pdf', autenticado, ConvenioController.pdf);
+export default router;

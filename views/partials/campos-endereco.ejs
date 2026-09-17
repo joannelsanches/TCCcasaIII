@@ -1,0 +1,59 @@
+<%
+  const valoresEndereco = typeof valores !== 'undefined' && valores ? valores : {};
+  const errosEnderecoView = typeof erros !== 'undefined' && erros ? erros : {};
+  const valorCampoEndereco = (sufixo, atual = '') => {
+    const chave = `${prefixo}${sufixo}`;
+    return Object.prototype.hasOwnProperty.call(valoresEndereco, chave) ? valoresEndereco[chave] : (atual || '');
+  };
+  const erroCampoEndereco = (sufixo) => errosEnderecoView[`${prefixo}${sufixo}`];
+%>
+
+<div class="field full address-heading">
+  <strong><%= tituloEndereco || 'Endereço' %></strong>
+  <% if (typeof ajudaEndereco !== 'undefined' && ajudaEndereco) { %>
+    <small class="help"><%= ajudaEndereco %></small>
+  <% } %>
+</div>
+
+<div class="field full <%= erroCampoEndereco('Logradouro') ? 'field-invalid' : '' %>">
+  <label for="<%= prefixo %>Logradouro">Rua ou logradouro<%= obrigatorio ? ' *' : '' %></label>
+  <input id="<%= prefixo %>Logradouro" name="<%= prefixo %>Logradouro" value="<%= valorCampoEndereco('Logradouro', valor?.logradouro) %>" <%= obrigatorio ? 'required' : '' %> data-endereco-campo aria-invalid="<%= erroCampoEndereco('Logradouro') ? 'true' : 'false' %>">
+  <% if (erroCampoEndereco('Logradouro')) { %><small class="field-error"><%= erroCampoEndereco('Logradouro') %></small><% } %>
+</div>
+
+<div class="field <%= erroCampoEndereco('Numero') ? 'field-invalid' : '' %>">
+  <label for="<%= prefixo %>Numero">Número<%= obrigatorio ? ' *' : '' %></label>
+  <input id="<%= prefixo %>Numero" name="<%= prefixo %>Numero" value="<%= valorCampoEndereco('Numero', valor?.numero) %>" <%= obrigatorio ? 'required' : '' %> data-endereco-campo aria-invalid="<%= erroCampoEndereco('Numero') ? 'true' : 'false' %>">
+  <% if (erroCampoEndereco('Numero')) { %><small class="field-error"><%= erroCampoEndereco('Numero') %></small><% } %>
+</div>
+
+<div class="field">
+  <label for="<%= prefixo %>Complemento">Complemento</label>
+  <input id="<%= prefixo %>Complemento" name="<%= prefixo %>Complemento" value="<%= valorCampoEndereco('Complemento', valor?.complemento) %>" data-endereco-campo>
+</div>
+
+<div class="field <%= erroCampoEndereco('Bairro') ? 'field-invalid' : '' %>">
+  <label for="<%= prefixo %>Bairro">Bairro<%= obrigatorio ? ' *' : '' %></label>
+  <input id="<%= prefixo %>Bairro" name="<%= prefixo %>Bairro" value="<%= valorCampoEndereco('Bairro', valor?.bairro) %>" <%= obrigatorio ? 'required' : '' %> data-endereco-campo aria-invalid="<%= erroCampoEndereco('Bairro') ? 'true' : 'false' %>">
+  <% if (erroCampoEndereco('Bairro')) { %><small class="field-error"><%= erroCampoEndereco('Bairro') %></small><% } %>
+</div>
+
+<div class="field <%= erroCampoEndereco('Cidade') ? 'field-invalid' : '' %>">
+  <label for="<%= prefixo %>Cidade">Cidade<%= obrigatorio ? ' *' : '' %></label>
+  <input id="<%= prefixo %>Cidade" name="<%= prefixo %>Cidade" value="<%= valorCampoEndereco('Cidade', valor?.cidade) %>" <%= obrigatorio ? 'required' : '' %> data-endereco-campo aria-invalid="<%= erroCampoEndereco('Cidade') ? 'true' : 'false' %>">
+  <% if (erroCampoEndereco('Cidade')) { %><small class="field-error"><%= erroCampoEndereco('Cidade') %></small><% } %>
+</div>
+
+<div class="field <%= erroCampoEndereco('Estado') ? 'field-invalid' : '' %>">
+  <label for="<%= prefixo %>Estado">Estado (UF)<%= obrigatorio ? ' *' : '' %></label>
+  <input id="<%= prefixo %>Estado" name="<%= prefixo %>Estado" value="<%= valorCampoEndereco('Estado', valor?.estado) %>" minlength="2" maxlength="2" pattern="[A-Za-z]{2}" placeholder="RS" <%= obrigatorio ? 'required' : '' %> data-uf data-endereco-campo aria-invalid="<%= erroCampoEndereco('Estado') ? 'true' : 'false' %>">
+  <% if (erroCampoEndereco('Estado')) { %><small class="field-error"><%= erroCampoEndereco('Estado') %></small><% } %>
+</div>
+
+<div class="field <%= erroCampoEndereco('Cep') ? 'field-invalid' : '' %>" data-cep-group data-prefixo-endereco="<%= prefixo %>">
+  <label for="<%= prefixo %>Cep">CEP<%= obrigatorio ? ' *' : '' %></label>
+  <% const cepAtual = valorCampoEndereco('Cep', valor?.cep); %>
+  <input id="<%= prefixo %>Cep" name="<%= prefixo %>Cep" value="<%= cepAtual ? formatarCep(cepAtual) : '' %>" inputmode="numeric" maxlength="9" pattern="\d{5}-?\d{3}" placeholder="00000-000" <%= obrigatorio ? 'required' : '' %> data-cep data-endereco-campo aria-invalid="<%= erroCampoEndereco('Cep') ? 'true' : 'false' %>" aria-describedby="status-<%= prefixo %>Cep<%= erroCampoEndereco('Cep') ? ` erro-${prefixo}Cep` : '' %>">
+  <small class="cep-status help" id="status-<%= prefixo %>Cep" data-cep-status aria-live="polite"></small>
+  <% if (erroCampoEndereco('Cep')) { %><small class="field-error" id="erro-<%= prefixo %>Cep"><%= erroCampoEndereco('Cep') %></small><% } %>
+</div>

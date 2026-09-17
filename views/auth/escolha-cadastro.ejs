@@ -1,0 +1,50 @@
+<%- include('../partials/cabecalho', { titulo: 'Cadastro' }) %>
+
+    <section class="section">
+        <div class="container">
+
+            <div class="page-header">
+                <h1>Como você quer usar o StartIF?</h1>
+                <p class="muted">
+                    Escolha o perfil correto para criar sua conta.
+                </p>
+            </div>
+
+            <div class="grid-2">
+
+                <article class="card">
+                    <span class="eyebrow">Estudante</span>
+
+                    <h2>Quero encontrar estágio</h2>
+
+                    <p>
+                        Use seu e-mail institucional, complete o perfil acadêmico
+                        e candidate-se.
+                    </p>
+
+                    <a class="btn" href="/cadastro/estudante">
+                        Cadastro de estudante
+                    </a>
+                </article>
+
+                <article class="card">
+                    <span class="eyebrow">Empresa</span>
+
+                    <h2>Quero publicar vagas</h2>
+
+                    <p>
+                        Cadastre a organização e aguarde a validação do convênio
+                        pelo IFSul.
+                    </p>
+
+                    <a class="btn" href="/cadastro/empresa">
+                        Cadastro de empresa
+                    </a>
+                </article>
+
+            </div>
+
+        </div>
+    </section>
+
+    <%- include('../partials/rodape') %>

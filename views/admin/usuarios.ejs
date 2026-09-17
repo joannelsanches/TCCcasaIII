@@ -1,0 +1,75 @@
+<%- include('../partials/cabecalho', { titulo: 'Usuários' }) %>
+
+<section class="section">
+  <div class="container container-wide">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Administração</span>
+      <h1>Gerenciar usuários</h1>
+      <p class="muted">Pesquise nos dados da conta e nos perfis vinculados sem carregar todos os registros no navegador.</p>
+    </div>
+
+    <form method="get" class="card admin-search" role="search">
+      <div class="field">
+        <label for="busca-usuario">Nome, e-mail, matrícula, CPF, CNPJ ou empresa</label>
+        <input id="busca-usuario" name="q" value="<%= busca %>" placeholder="Digite para pesquisar">
+      </div>
+      <div class="field">
+        <label for="tipo-usuario">Tipo de usuário</label>
+        <select id="tipo-usuario" name="tipo">
+          <option value="">Todos os perfis</option>
+          <% ['ESTUDANTE','EMPRESA','ADMIN'].forEach(item => { %><option value="<%= item %>" <%= tipo === item ? 'selected' : '' %>><%= item %></option><% }) %>
+        </select>
+      </div>
+      <div class="actions search-actions"><button class="btn">Pesquisar</button><a class="btn btn-secondary" href="/admin/usuarios">Limpar</a></div>
+    </form>
+
+    <div class="results-summary" aria-live="polite"><strong><%= paginacao.total %></strong> resultado(s) encontrado(s)</div>
+
+    <% if (usuarios.length) { %>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Usuário</th><th>Contato</th><th>Perfil</th><th>Identificação</th><th>Situação</th><th>Matrícula</th><th>Ação</th></tr></thead>
+          <tbody>
+            <% usuarios.forEach(usuario => { const estudante = perfisEstudante[String(usuario._id)]; const empresa = perfisEmpresa[String(usuario._id)]; %>
+              <tr>
+                <td>
+                  <div class="table-media">
+                    <% if (estudante?.fotoPerfil?.caminho) { %><img class="round" src="/midia/estudantes/<%= estudante._id %>/foto" alt=""><% } else if (empresa?.logo?.caminho) { %><img src="/midia/empresas/<%= empresa._id %>/logo" alt=""><% } else { %><span class="media-placeholder"><%= iniciais(empresa?.nomeFantasia || usuario.nome) %></span><% } %>
+                    <div><strong><%= formatarNomeProprio(empresa?.nomeFantasia || usuario.nome) %></strong><small>Criado em <%= formatarData(usuario.dataCriacao) %></small></div>
+                  </div>
+                </td>
+                <td><%= usuario.email %></td>
+                <td><span class="badge"><%= usuario.tipo %></span></td>
+                <td>
+                  <% if (estudante) { %><strong>Matrícula:</strong> <%= estudante.matricula %><br><small>CPF final <%= estudante.cpf?.slice(-4) || '—' %></small>
+                  <% } else if (empresa) { %><%= empresa.razaoSocial || empresa.nomeFantasia %><br><small>CNPJ final <%= empresa.cnpj?.slice(-4) || '—' %></small>
+                  <% } else { %>—<% } %>
+                </td>
+                <td><span class="badge <%= usuario.ativo ? 'ativo' : 'inativo' %>"><%= usuario.ativo ? 'ATIVO' : 'INATIVO' %></span></td>
+                <td>
+                  <% if (estudante) { %>
+                    <span class="badge <%= estudante.matriculaRegular ? 'ativo' : 'pendente' %>"><%= estudante.matriculaRegular ? 'REGULAR' : 'NÃO VALIDADA' %></span>
+                    <form method="post" action="/admin/usuarios/<%= usuario._id %>/matricula" data-confirmar="Alterar a validação da matrícula?" class="separate-action"><button class="btn btn-small btn-secondary"><%= estudante.matriculaRegular ? 'Revogar' : 'Validar' %></button></form>
+                  <% } else { %>—<% } %>
+                </td>
+                <td><form method="post" action="/admin/usuarios/<%= usuario._id %>/alternar" data-confirmar="Confirma a alteração desta conta?"><button class="btn btn-small <%= usuario.ativo ? 'btn-danger' : '' %>"><%= usuario.ativo ? 'Desativar' : 'Ativar' %></button></form></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+
+      <% if (paginacao.totalPaginas > 1) { %>
+        <nav class="pagination" aria-label="Paginação dos usuários">
+          <% for (let pagina = 1; pagina <= paginacao.totalPaginas; pagina += 1) { %>
+            <a class="<%= pagina === paginacao.pagina ? 'active' : '' %>" href="/admin/usuarios?tipo=<%= encodeURIComponent(tipo) %>&q=<%= encodeURIComponent(busca) %>&pagina=<%= pagina %>" aria-current="<%= pagina === paginacao.pagina ? 'page' : 'false' %>"><%= pagina %></a>
+          <% } %>
+        </nav>
+      <% } %>
+    <% } else { %>
+      <div class="empty">Nenhum usuário corresponde à pesquisa e ao tipo informados.</div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <title>
+        <%= typeof titulo !== 'undefined' ? titulo + ' | StartIF' : 'StartIF' %>
+    </title>
+
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container nav">
+
+            <a class="logo" href="/">
+                <span class="logo-mark" aria-hidden="true">
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                </span>
+                StartIF
+            </a>
+
+            <% if (!usuarioLogado) { %>
+                <a class="btn btn-small mobile-login" href="/login">Entrar</a>
+            <% } %>
+
+            <button
+                class="menu-toggle"
+                data-menu
+                aria-label="Abrir menu"
+                aria-expanded="false"
+                aria-controls="menu-principal"
+            >
+                Menu
+            </button>
+
+            <nav class="nav-links" id="menu-principal" aria-label="Navegação principal">
+
+                <% if (!usuarioLogado) { %>
+
+                    <a href="/">Início</a>
+                    <a href="/vagas">Vagas</a>
+                    <a href="/cadastro">Cadastre-se</a>
+                    <a class="btn btn-small" href="/login">Entrar</a>
+
+                <% } %>
+
+
+                <% if (usuarioLogado?.tipo === 'ESTUDANTE') { %>
+
+                    <a href="/estudante">Painel</a>
+                    <a href="/vagas">Vagas</a>
+                    <a href="/estudante/candidaturas">Candidaturas</a>
+                    <a href="/termos">Termos</a>
+                    <a href="/avaliacoes">Avaliações</a>
+                    <a href="/estudante/historico">Histórico</a>
+                    <a href="/notificacoes" class="nav-notifications">
+                        Notificações
+                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+                    </a>
+                    <a href="/estudante/perfil">Perfil</a>
+
+                    <span class="user-chip">
+                        <%= formatarNomeProprio(usuarioLogado.nome) %>
+                    </span>
+
+                    <form action="/logout" method="post">
+                        <button class="link-button">
+                            Sair
+                        </button>
+                    </form>
+
+                <% } %>
+
+
+                <% if (usuarioLogado?.tipo === 'EMPRESA') { %>
+
+                    <a href="/empresa">Painel</a>
+                    <a href="/empresa/vagas">Vagas</a>
+                    <a href="/termos">Termos</a>
+                    <a href="/avaliacoes">Avaliações</a>
+                    <a href="/notificacoes" class="nav-notifications">
+                        Notificações
+                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+                    </a>
+                    <a href="/empresa/perfil">Perfil</a>
+
+                    <span class="user-chip">
+                        <%= formatarNomeProprio(usuarioLogado.nome) %>
+                    </span>
+
+                    <form action="/logout" method="post">
+                        <button class="link-button">
+                            Sair
+                        </button>
+                    </form>
+
+                <% } %>
+
+
+                <% if (usuarioLogado?.tipo === 'ADMIN') { %>
+
+                    <a href="/admin">Painel</a>
+                    <a href="/admin/usuarios">Usuários</a>
+                    <a href="/admin/empresas">Empresas</a>
+                    <a href="/admin/convenios">Convênios</a>
+                    <a href="/admin/cadastros">Cadastros</a>
+                    <a href="/admin/vagas">Vagas</a>
+                    <a href="/termos">Termos</a>
+                    <a href="/admin/relatorios">Relatórios</a>
+                    <a href="/admin/notificacoes">Notificar</a>
+                    <a href="/notificacoes" class="nav-notifications">
+                        Notificações
+                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+                    </a>
+                    <a href="/avaliacoes">Avaliações</a>
+
+                    <form action="/logout" method="post">
+                        <button class="link-button">
+                            Sair
+                        </button>
+                    </form>
+
+                <% } %>
+
+            </nav>
+
+        </div>
+    </header>
+
+    <main>
+
+        <% if (mensagem) { %>
+
+            <div class="container">
+                <div
+                    class="alert <%= mensagem.tipo %>"
+                    role="alert"
+                >
+                    <%= mensagem.texto %>
+                </div>
+            </div>
+
+        <% } %>

@@ -1,0 +1,15 @@
+<% const notaAnterior = Number((typeof valores !== 'undefined' && valores?.nota) || 0); const erroNota = typeof erros !== 'undefined' ? erros?.nota : ''; %>
+<fieldset class="field full rating <%= erroNota ? 'field-invalid' : '' %>" data-rating aria-invalid="<%= erroNota ? 'true' : 'false' %>">
+    <legend>Nota *</legend>
+    <div class="rating-options">
+        <% [1,2,3,4,5].forEach(n => { %>
+            <input class="sr-only" type="radio" id="nota-<%= identificador %>-<%= n %>" name="nota" value="<%= n %>" <%= n === 1 ? 'required' : '' %> <%= notaAnterior === n ? 'checked' : '' %>>
+            <label for="nota-<%= identificador %>-<%= n %>" data-value="<%= n %>" title="<%= n %> estrela<%= n > 1 ? 's' : '' %>">
+                <span aria-hidden="true">★</span>
+                <span class="sr-only"><%= n %> estrela<%= n > 1 ? 's' : '' %></span>
+            </label>
+        <% }) %>
+    </div>
+    <p class="rating-text" aria-live="polite">Nenhuma nota selecionada</p>
+    <% if (erroNota) { %><small class="field-error"><%= erroNota %></small><% } %>
+</fieldset>

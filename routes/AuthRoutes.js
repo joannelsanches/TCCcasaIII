@@ -1,0 +1,14 @@
+import express from 'express';
+import AuthController from '../controllers/AuthController.js';
+import { visitante } from '../middlewares/autenticacao.js';
+import { uploadLogoEmpresa } from '../config/upload.js';
+const router = express.Router();
+router.get('/login', visitante, AuthController.loginForm);
+router.post('/login', visitante, AuthController.entrar);
+router.post('/logout', AuthController.sair);
+router.get('/cadastro', visitante, AuthController.escolhaCadastro);
+router.get('/cadastro/estudante', visitante, AuthController.cadastroEstudanteForm);
+router.post('/cadastro/estudante', visitante, AuthController.cadastrarEstudante);
+router.get('/cadastro/empresa', visitante, AuthController.cadastroEmpresaForm);
+router.post('/cadastro/empresa', visitante, uploadLogoEmpresa.single('logo'), AuthController.cadastrarEmpresa);
+export default router;

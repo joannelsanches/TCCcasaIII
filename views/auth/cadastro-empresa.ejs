@@ -1,0 +1,40 @@
+<%- include('../partials/cabecalho', { titulo: 'Cadastro de empresa' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="page-header">
+      <h1>Cadastro de empresa</h1>
+      <p class="muted">O cadastro e o convênio serão analisados pelo setor de estágios.</p>
+    </div>
+
+    <div class="card form-card">
+      <% if (erros?.geral) { %><div class="alert erro" role="alert"><%= erros.geral %></div><% } %>
+      <form method="post" enctype="multipart/form-data" class="form-grid">
+        <div class="field <%= erros?.nome ? 'field-invalid' : '' %>"><label for="nome">Nome do usuário responsável *</label><input id="nome" name="nome" value="<%= valores?.nome || '' %>" required aria-invalid="<%= erros?.nome ? 'true' : 'false' %>"><% if (erros?.nome) { %><small class="field-error"><%= erros.nome %></small><% } %></div>
+        <div class="field <%= erros?.email ? 'field-invalid' : '' %>"><label for="email">E-mail de acesso *</label><input id="email" name="email" type="email" value="<%= valores?.email || '' %>" required aria-invalid="<%= erros?.email ? 'true' : 'false' %>"><% if (erros?.email) { %><small class="field-error"><%= erros.email %></small><% } %></div>
+        <div class="field <%= erros?.cnpj ? 'field-invalid' : '' %>"><label for="cnpj">CNPJ *</label><input id="cnpj" name="cnpj" value="<%= valores?.cnpj || '' %>" inputmode="numeric" maxlength="18" required aria-invalid="<%= erros?.cnpj ? 'true' : 'false' %>"><% if (erros?.cnpj) { %><small class="field-error"><%= erros.cnpj %></small><% } %></div>
+        <div class="field <%= erros?.razaoSocial ? 'field-invalid' : '' %>"><label for="razaoSocial">Razão social *</label><input id="razaoSocial" name="razaoSocial" value="<%= valores?.razaoSocial || '' %>" required aria-invalid="<%= erros?.razaoSocial ? 'true' : 'false' %>"><% if (erros?.razaoSocial) { %><small class="field-error"><%= erros.razaoSocial %></small><% } %></div>
+        <div class="field <%= erros?.nomeFantasia ? 'field-invalid' : '' %>"><label for="nomeFantasia">Nome fantasia *</label><input id="nomeFantasia" name="nomeFantasia" value="<%= valores?.nomeFantasia || '' %>" required aria-invalid="<%= erros?.nomeFantasia ? 'true' : 'false' %>"><% if (erros?.nomeFantasia) { %><small class="field-error"><%= erros.nomeFantasia %></small><% } %></div>
+        <div class="field <%= erros?.telefone ? 'field-invalid' : '' %>"><label for="telefone">Telefone *</label><input id="telefone" name="telefone" value="<%= valores?.telefone || '' %>" required aria-invalid="<%= erros?.telefone ? 'true' : 'false' %>"><% if (erros?.telefone) { %><small class="field-error"><%= erros.telefone %></small><% } %></div>
+        <div class="field"><label for="emailContato">E-mail de contato</label><input id="emailContato" name="emailContato" type="email" value="<%= valores?.emailContato || '' %>"></div>
+        <div class="field <%= erros?.responsavelNome ? 'field-invalid' : '' %>"><label for="responsavelNome">Nome do responsável *</label><input id="responsavelNome" name="responsavelNome" value="<%= valores?.responsavelNome || '' %>" required aria-invalid="<%= erros?.responsavelNome ? 'true' : 'false' %>"><% if (erros?.responsavelNome) { %><small class="field-error"><%= erros.responsavelNome %></small><% } %></div>
+        <div class="field <%= erros?.responsavelCargo ? 'field-invalid' : '' %>"><label for="responsavelCargo">Cargo do responsável *</label><input id="responsavelCargo" name="responsavelCargo" value="<%= valores?.responsavelCargo || '' %>" required aria-invalid="<%= erros?.responsavelCargo ? 'true' : 'false' %>"><% if (erros?.responsavelCargo) { %><small class="field-error"><%= erros.responsavelCargo %></small><% } %></div>
+
+        <%- include('../partials/campos-endereco', { prefixo: 'endereco', valor: {}, obrigatorio: true, tituloEndereco: 'Endereço da empresa' }) %>
+
+        <div class="field full"><label>Descrição da empresa</label><textarea name="descricao"><%= valores?.descricao || '' %></textarea></div>
+        <div class="field full image-field">
+          <label for="logo">Logo da empresa (opcional)</label>
+          <div class="image-preview image-preview-logo" data-preview-box hidden><img alt="Pré-visualização da logo" data-preview-image></div>
+          <input id="logo" type="file" name="logo" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" data-image-input data-preview-target="[data-preview-image]">
+          <small class="help">JPG, PNG ou WebP. Limite definido no .env.</small>
+        </div>
+        <div class="field <%= erros?.senha ? 'field-invalid' : '' %>"><label>Senha *</label><input name="senha" type="password" minlength="8" required aria-invalid="<%= erros?.senha ? 'true' : 'false' %>"><% if (erros?.senha) { %><small class="field-error"><%= erros.senha %></small><% } %></div>
+        <div class="field <%= erros?.confirmarSenha ? 'field-invalid' : '' %>"><label>Confirmar senha *</label><input name="confirmarSenha" type="password" minlength="8" required aria-invalid="<%= erros?.confirmarSenha ? 'true' : 'false' %>"><% if (erros?.confirmarSenha) { %><small class="field-error"><%= erros.confirmarSenha %></small><% } %></div>
+        <div class="field full"><button class="btn">Cadastrar empresa</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

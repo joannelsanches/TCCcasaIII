@@ -1,0 +1,64 @@
+<%- include('../partials/cabecalho', { titulo: 'Detalhes do candidato' }) %>
+
+<section class="section">
+  <div class="container">
+    <div class="page-header page-header-left">
+      <a class="back-link" href="/empresa/candidatos/<%= candidatura.vaga._id %>">← Voltar aos candidatos</a>
+      <h1>Detalhes do candidato</h1>
+    </div>
+
+    <div class="split">
+      <article class="card">
+        <div class="candidate-heading">
+          <% if (candidatura.estudante.fotoPerfil?.caminho) { %>
+            <img class="profile-photo" src="/midia/estudantes/<%= candidatura.estudante._id %>/foto" alt="Foto de <%= formatarNomeProprio(candidatura.estudante.usuario.nome) %>">
+          <% } else { %>
+            <span class="profile-photo initials" aria-label="Sem foto"><%= iniciais(candidatura.estudante.usuario.nome) %></span>
+          <% } %>
+          <div><span class="eyebrow">Candidato</span><h2><%= formatarNomeProprio(candidatura.estudante.usuario.nome) %></h2><p class="muted"><%= candidatura.estudante.curso?.nome %></p></div>
+        </div>
+
+        <div class="details-list spaced">
+          <div><strong>Campus</strong><%= candidatura.estudante.campus?.nome || '—' %></div>
+          <div><strong>Semestre</strong><%= candidatura.estudante.semestre || '—' %></div>
+          <div><strong>Turno</strong><%= candidatura.estudante.turno || '—' %></div>
+          <div><strong>Disponibilidade</strong><%= candidatura.estudante.disponibilidade || '—' %></div>
+          <div class="full-detail"><strong>Competências</strong><%= candidatura.estudante.competencias?.join(', ') || '—' %></div>
+        </div>
+
+        <div class="actions">
+          <% if (candidatura.estudante.curriculo?.caminho) { %>
+            <a class="btn btn-secondary" href="/estudantes/<%= candidatura.estudante._id %>/curriculo">Baixar currículo</a>
+          <% } else { %><span class="muted">Currículo não enviado.</span><% } %>
+        </div>
+      </article>
+
+      <aside class="card selection-panel">
+        <div class="section-heading">
+          <div><span class="eyebrow">Processo seletivo</span><h2><%= candidatura.vaga.titulo %></h2></div>
+          <span class="badge <%= candidatura.status.toLowerCase() %>"><%= candidatura.status.replaceAll('_', ' ') %></span>
+        </div>
+        <%- include('../partials/linha-tempo-estagio', { candidatura, termo }) %>
+
+        <% if (proximosStatus.length) { %>
+          <form method="post" action="/empresa/candidaturas/<%= candidatura._id %>/status" class="stack spaced">
+            <div class="field">
+              <label for="status">Próxima etapa</label>
+              <select id="status" name="status" required>
+                <option value="">Selecione</option>
+                <% proximosStatus.forEach(status => { %><option value="<%= status %>"><%= status.replaceAll('_', ' ') %></option><% }) %>
+              </select>
+              <small class="help">Somente transições compatíveis com a etapa atual são permitidas.</small>
+            </div>
+            <div class="field"><label for="observacaoEmpresa">Observação para o estudante</label><textarea id="observacaoEmpresa" name="observacaoEmpresa" maxlength="1000"><%= candidatura.observacaoEmpresa || '' %></textarea></div>
+            <button class="btn">Atualizar etapa</button>
+          </form>
+        <% } else { %>
+          <div class="alert aviso"><strong>Etapa final:</strong> esta candidatura não pode ser alterada pela empresa.</div>
+        <% } %>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

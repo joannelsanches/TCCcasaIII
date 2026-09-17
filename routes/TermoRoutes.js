@@ -1,0 +1,18 @@
+import express from 'express';
+import TermoController from '../controllers/TermoController.js';
+import { uploadDocumento } from '../config/upload.js';
+import { autenticado, autorizar } from '../middlewares/autenticacao.js';
+const router = express.Router();
+router.get('/termos', autenticado, TermoController.listar);
+router.post('/termos', autenticado, autorizar('ESTUDANTE'), TermoController.solicitar);
+router.post('/termos/:id/documentos', autenticado, autorizar('ESTUDANTE'), uploadDocumento.single('documento'), TermoController.enviarDocumento);
+router.post('/termos/:id/tce-assinado', autenticado, autorizar('ESTUDANTE'), uploadDocumento.single('tceAssinado'), TermoController.enviarTceAssinado);
+router.post('/termos/:id/enviar-analise', autenticado, autorizar('ESTUDANTE'), TermoController.enviarAnalise);
+router.get('/termos/documentos/:documentoId', autenticado, TermoController.documento);
+router.get('/termos/:id/tce-assinado', autenticado, TermoController.tceAssinado);
+router.post('/termos/:id/analisar', autenticado, autorizar('ADMIN'), TermoController.analisar);
+router.post('/termos/:id/iniciar', autenticado, autorizar('ADMIN'), TermoController.iniciar);
+router.post('/termos/:id/documentos/:documentoId/validar', autenticado, autorizar('ADMIN'), TermoController.validarDocumento);
+router.post('/termos/:id/encerrar', autenticado, autorizar('ADMIN'), TermoController.encerrar);
+router.post('/termos/:id/rescindir', autenticado, autorizar('ADMIN'), TermoController.rescindir);
+export default router;

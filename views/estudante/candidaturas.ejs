@@ -1,0 +1,54 @@
+<%- include('../partials/cabecalho', { titulo: 'Minhas candidaturas' }) %>
+
+<section class="section">
+  <div class="container container-wide">
+    <div class="page-header page-header-left">
+      <span class="eyebrow">Processos seletivos</span>
+      <h1>Minhas candidaturas</h1>
+      <p class="muted">Acompanhe cada etapa com os estados registrados pela empresa e pelo IFSul.</p>
+    </div>
+
+    <div class="stack">
+      <% candidaturas.forEach(candidatura => { const termo = termosPorCandidatura[String(candidatura._id)]; %>
+        <article class="card application-card">
+          <div class="section-heading">
+            <div>
+              <span class="tag"><%= candidatura.vaga?.areaAtuacao?.nome || 'Estágio' %></span>
+              <h2><a href="/vagas/<%= candidatura.vaga?._id %>"><%= candidatura.vaga?.titulo || 'Vaga removida' %></a></h2>
+              <p class="muted"><%= formatarNomeProprio(candidatura.vaga?.empresa?.nomeFantasia || 'Empresa') %> · candidatura em <%= formatarData(candidatura.dataCandidatura) %></p>
+            </div>
+            <span class="badge <%= candidatura.status.toLowerCase() %>"><%= candidatura.status.replaceAll('_', ' ') %></span>
+          </div>
+
+          <%- include('../partials/linha-tempo-estagio', { candidatura, termo }) %>
+
+          <% if (candidatura.observacaoEmpresa) { %>
+            <div class="process-note"><strong>Observação da empresa</strong><p><%= candidatura.observacaoEmpresa %></p></div>
+          <% } %>
+          <% if (candidatura.status === 'CANCELADO' && candidatura.motivoCancelamento) { %>
+            <div class="process-note"><strong>Motivo do cancelamento</strong><p><%= candidatura.motivoCancelamento %></p></div>
+          <% } %>
+
+          <% if (candidatura.status === 'EM_ANALISE' && !termo) { %>
+            <details class="cancel-application">
+              <summary>Cancelar candidatura</summary>
+              <form method="post" action="/estudante/candidaturas/<%= candidatura._id %>/cancelar" class="form-grid compact-action" data-confirmar="Confirma o cancelamento? O registro continuará visível no histórico.">
+                <div class="field full">
+                  <label for="motivo-<%= candidatura._id %>">Motivo (opcional)</label>
+                  <textarea id="motivo-<%= candidatura._id %>" name="motivo" maxlength="500" placeholder="Se desejar, explique o motivo."></textarea>
+                </div>
+                <div class="field full"><button class="btn btn-danger">Confirmar cancelamento</button></div>
+              </form>
+            </details>
+          <% } %>
+        </article>
+      <% }) %>
+    </div>
+
+    <% if (!candidaturas.length) { %>
+      <div class="empty">Você ainda não se candidatou. <a href="/vagas">Conheça as vagas abertas.</a></div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/rodape') %>

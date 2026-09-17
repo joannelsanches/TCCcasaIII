@@ -1,0 +1,78 @@
+<%- include('../partials/cabecalho', { titulo: 'Painel administrativo' }) %>
+
+<section class="section">
+    <div class="container">
+
+        <div class="page-header">
+            <span class="eyebrow">Administração</span>
+
+            <h1>Visão geral do StartIF</h1>
+
+            <p class="muted">
+                Métricas calculadas diretamente a partir do banco de dados.
+            </p>
+        </div>
+
+        <div class="metrics">
+
+            <div class="metric">
+                <strong><%= metricas.estudantes %></strong>
+                <span>estudantes</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= metricas.empresas %></strong>
+                <span>empresas</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= metricas.conveniadas %></strong>
+                <span>conveniadas</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= metricas.vagasAbertas %></strong>
+                <span>vagas abertas</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= metricas.vagasPendentes %></strong>
+                <span>vagas pendentes</span>
+            </div>
+
+            <div class="metric">
+                <strong><%= metricas.emEstagio %></strong>
+                <span>termos aprovados</span>
+            </div>
+
+        </div>
+
+        <div class="grid" style="margin-top:35px">
+
+            <a class="card" href="/admin/vagas">
+                <h2>Validar vagas</h2>
+                <p>
+                    Confira compatibilidade com curso e PPC.
+                </p>
+            </a>
+
+            <a class="card" href="/termos">
+                <h2>Analisar termos</h2>
+                <p>
+                    Valide documentos e termos de compromisso.
+                </p>
+            </a>
+
+            <a class="card" href="/admin/relatorios">
+                <h2>Emitir relatórios</h2>
+                <p>
+                    Filtre registros e exporte em CSV.
+                </p>
+            </a>
+
+        </div>
+
+    </div>
+</section>
+
+<%- include('../partials/rodape') %>
