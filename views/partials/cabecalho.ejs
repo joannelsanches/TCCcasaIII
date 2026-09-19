@@ -3,10 +3,13 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>
-        <%= typeof titulo !== 'undefined' ? titulo + ' | StartIF' : 'StartIF' %>
+        <%= typeof titulo !== 'undefined'
+            ? titulo + ' | StartIF'
+            : 'StartIF'
+        %>
     </title>
 
     <link rel="stylesheet" href="/css/style.css">
@@ -17,22 +20,23 @@
     <header class="site-header">
         <div class="container nav">
 
-            <a class="logo" href="/">
-                <span class="logo-mark" aria-hidden="true">
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                    <i></i>
-                </span>
-                StartIF
+            <a class="logo" href="/" aria-label="Página inicial do StartIF">
+                <img src="/images/logo.png" alt="">
+                <span>StartIF</span>
             </a>
 
             <% if (!usuarioLogado) { %>
-                <a class="btn btn-small mobile-login" href="/login">Entrar</a>
+                <a
+                    class="btn btn-small login-button mobile-login"
+                    href="/login"
+                >
+                    Entrar
+                </a>
             <% } %>
 
             <button
                 class="menu-toggle"
+                type="button"
                 data-menu
                 aria-label="Abrir menu"
                 aria-expanded="false"
@@ -41,17 +45,26 @@
                 Menu
             </button>
 
-            <nav class="nav-links" id="menu-principal" aria-label="Navegação principal">
+            <nav
+                class="nav-links"
+                id="menu-principal"
+                aria-label="Navegação principal"
+            >
 
                 <% if (!usuarioLogado) { %>
 
                     <a href="/">Início</a>
                     <a href="/vagas">Vagas</a>
                     <a href="/cadastro">Cadastre-se</a>
-                    <a class="btn btn-small" href="/login">Entrar</a>
+
+                    <a
+                        class="btn btn-small login-button"
+                        href="/login"
+                    >
+                        Entrar
+                    </a>
 
                 <% } %>
-
 
                 <% if (usuarioLogado?.tipo === 'ESTUDANTE') { %>
 
@@ -61,10 +74,23 @@
                     <a href="/termos">Termos</a>
                     <a href="/avaliacoes">Avaliações</a>
                     <a href="/estudante/historico">Histórico</a>
+
                     <a href="/notificacoes" class="nav-notifications">
                         Notificações
-                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+
+                        <% if (notificacoesNaoLidas > 0) { %>
+                            <span
+                                class="notification-count"
+                                aria-label="<%= notificacoesNaoLidas %> notificações não lidas"
+                            >
+                                <%= notificacoesNaoLidas > 99
+                                    ? '99+'
+                                    : notificacoesNaoLidas
+                                %>
+                            </span>
+                        <% } %>
                     </a>
+
                     <a href="/estudante/perfil">Perfil</a>
 
                     <span class="user-chip">
@@ -72,13 +98,12 @@
                     </span>
 
                     <form action="/logout" method="post">
-                        <button class="link-button">
+                        <button class="link-button" type="submit">
                             Sair
                         </button>
                     </form>
 
                 <% } %>
-
 
                 <% if (usuarioLogado?.tipo === 'EMPRESA') { %>
 
@@ -86,10 +111,23 @@
                     <a href="/empresa/vagas">Vagas</a>
                     <a href="/termos">Termos</a>
                     <a href="/avaliacoes">Avaliações</a>
+
                     <a href="/notificacoes" class="nav-notifications">
                         Notificações
-                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+
+                        <% if (notificacoesNaoLidas > 0) { %>
+                            <span
+                                class="notification-count"
+                                aria-label="<%= notificacoesNaoLidas %> notificações não lidas"
+                            >
+                                <%= notificacoesNaoLidas > 99
+                                    ? '99+'
+                                    : notificacoesNaoLidas
+                                %>
+                            </span>
+                        <% } %>
                     </a>
+
                     <a href="/empresa/perfil">Perfil</a>
 
                     <span class="user-chip">
@@ -97,13 +135,12 @@
                     </span>
 
                     <form action="/logout" method="post">
-                        <button class="link-button">
+                        <button class="link-button" type="submit">
                             Sair
                         </button>
                     </form>
 
                 <% } %>
-
 
                 <% if (usuarioLogado?.tipo === 'ADMIN') { %>
 
@@ -116,14 +153,27 @@
                     <a href="/termos">Termos</a>
                     <a href="/admin/relatorios">Relatórios</a>
                     <a href="/admin/notificacoes">Notificar</a>
+
                     <a href="/notificacoes" class="nav-notifications">
                         Notificações
-                        <% if (notificacoesNaoLidas > 0) { %><span class="notification-count" aria-label="<%= notificacoesNaoLidas %> notificações não lidas"><%= notificacoesNaoLidas > 99 ? '99+' : notificacoesNaoLidas %></span><% } %>
+
+                        <% if (notificacoesNaoLidas > 0) { %>
+                            <span
+                                class="notification-count"
+                                aria-label="<%= notificacoesNaoLidas %> notificações não lidas"
+                            >
+                                <%= notificacoesNaoLidas > 99
+                                    ? '99+'
+                                    : notificacoesNaoLidas
+                                %>
+                            </span>
+                        <% } %>
                     </a>
+
                     <a href="/avaliacoes">Avaliações</a>
 
                     <form action="/logout" method="post">
-                        <button class="link-button">
+                        <button class="link-button" type="submit">
                             Sair
                         </button>
                     </form>
